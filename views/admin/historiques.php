@@ -304,7 +304,7 @@ $title = "Historiques";
 
   <!-- Detail Drawer (Slide-in) -->
   <div
-    class="fixed right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
+    class="fixed hidden right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
     <div
       class="flex justify-between items-center px-8 pt-6 border-b border-surface-container-low relative">
       <span class="text-[10px] font-black uppercase tracking-[0.2em] text-secondary">

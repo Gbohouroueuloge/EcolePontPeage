@@ -152,7 +152,7 @@ $categories = [
     </section>
   </div>
 
-  <div class="fixed right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
+  <div class="fixed hidden right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
     <div class="px-8 py-10 border-b border-surface-container-low relative">
       <div class="flex justify-between items-center">
         <div class="flex items-center gap-4">

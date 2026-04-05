@@ -1,8 +1,8 @@
 <?php
 $navLinks = [
-  ['label' => "Tarifs", 'href' => "/tarifs"],
-  ['label' => "Abonnements", 'href' => "/abonnements"],
-  ['label' => "Contact", 'href' => "/contact"],
+  ['label' => "Tarifs", 'href' => "/tarifs", 'icon' => "directions_car"],
+  ['label' => "Abonnements", 'href' => "/abonnements", 'icon' => "payments"],
+  ['label' => "Contact", 'href' => "/contact", 'icon' => "email"],
 ]
 ?>
 <!DOCTYPE html>
@@ -65,7 +65,7 @@ $navLinks = [
   </header>
 
   <?= $content ?>
-
+  
   <!-- Footer -->
   <footer class="bg-primary-container text-white pt-24 pb-0 relative">
     <!-- 4px gold geometric band -->
@@ -167,6 +167,23 @@ $navLinks = [
       </div>
     </div>
   </footer>
+
+  <!-- BottomNavBar for Mobile (Hidden on Desktop) -->
+  <nav
+    class="fixed bottom-0 w-full flex md:hidden justify-around items-center h-20 px-4 bg-[#fef9f1] dark:bg-primary z-50 border-t border-primary/5">
+    <?php foreach ($navLinks as $link) : ?>
+      <a
+        href="<?= $link['href'] ?>"
+        class="flex flex-col items-center justify-center text-white font-bold">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+          <?= $link['icon'] ?>
+        </span>
+        <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">
+          <?= $link['label'] ?>
+        </span>
+      </a>
+    <?php endforeach; ?>
+  </nav>
 </body>
 
 </html>

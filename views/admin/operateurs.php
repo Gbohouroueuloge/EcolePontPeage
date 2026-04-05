@@ -189,7 +189,7 @@ $title = "Operators";
 
   <!-- Slide-in Side Panel (Agent Details) -->
   <div
-    class="fixed right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
+    class="fixed hidden right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
     <!-- Panel Header -->
     <div class="px-8 py-10 border-b border-surface-container-low relative">
       <button class="absolute top-8 right-8 text-slate-400 hover:text-primary">

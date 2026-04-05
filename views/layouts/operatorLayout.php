@@ -1,9 +1,9 @@
 <?php
 $navLinks = [
-  ['name' => "Passage", 'href' => "/operator"],
-  ['name' => "Caisse", 'href' => "/operator/caisse"],
-  ['name' => "Incident", 'href' => "/operator/incident"],
-  ['name' => "Mon Shift", 'href' => "/operator/mon-shift"],
+  ['name' => "Passage", 'href' => "/operator", 'icon' => "directions_car"],
+  ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
+  ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
+  ['name' => "Mon Shift", 'href' => "/operator/mon-shift", 'icon' => "schedule"],
 ];
 
 ?>
@@ -58,9 +58,11 @@ $navLinks = [
           class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
           <span class="material-symbols-outlined text-slate-600">settings</span>
         </button>
-        <div class="w-8 h-8 rounded-full overflow-hidden ml-2 ring-2 ring-surface-container-highest">
+        <a href="/" class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
+          <span class="material-symbols-outlined text-slate-600">home</span>
+        </a>
+        <div class="hidden md:flex items-center w-8 h-8 rounded-full overflow-hidden ml-2 ring-2 ring-surface-container-highest">
           <img alt="Operator Avatar" class="w-full h-full object-cover"
-            data-alt="Close-up portrait of a professional male highway operator in a smart uniform, clean lighting, studio background"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhvaV1U3ZLl4gdG95-OiIPrCe41blG3YoExDuAOXxv6shfPSGJt_JaWYMXuLsGdT5YHfIMb50LSBGAUNaxaQZkorHlNchAEVx9XUVHdB1ulfWGgP-rgWktZlXpWHqTWHeaRO2kgTRu5lIEAu8GSMkOpw3fVWctPBOSNOZIKCKWcBpb3gyJBNUdPhTu1kiwOGUIA2Stv6h2YPrR9WX4DLo0N_kUHuh24Co5jfwhNRg7joQVhKdhJu8CzCA30jQqy67wIQMnS-zdMn0V" />
         </div>
       </div>
@@ -72,26 +74,18 @@ $navLinks = [
   <!-- BottomNavBar for Mobile (Hidden on Desktop) -->
   <nav
     class="fixed bottom-0 w-full flex md:hidden justify-around items-center h-20 px-4 bg-[#fef9f1] dark:bg-primary z-50 border-t border-primary/5">
-    <div class="flex flex-col items-center justify-center text-secondary dark:text-secondary-container font-bold">
-      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_car</span>
-      <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">Passage</span>
-    </div>
-    <div class="flex flex-col items-center justify-center text-[#1d1c17] opacity-60 dark:text-slate-400">
-      <span class="material-symbols-outlined">payments</span>
-      <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">Caisse</span>
-    </div>
-    <div class="flex flex-col items-center justify-center text-[#1d1c17] opacity-60 dark:text-slate-400">
-      <span class="material-symbols-outlined">warning</span>
-      <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">Incident</span>
-    </div>
-    <div class="flex flex-col items-center justify-center text-[#1d1c17] opacity-60 dark:text-slate-400">
-      <span class="material-symbols-outlined">schedule</span>
-      <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">Mon Shift</span>
-    </div>
-    <div class="flex flex-col items-center justify-center text-[#1d1c17] opacity-60 dark:text-slate-400">
-      <span class="material-symbols-outlined">person</span>
-      <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">Profil</span>
-    </div>
+    <?php foreach ($navLinks as $link) : ?>
+      <a
+        href="<?= $link['href'] ?>"
+        class="flex flex-col items-center justify-center <?= $title === $link['name'] ? ' text-secondary border-b-2 border-secondary' : ' text-slate-500' ?> font-bold">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+          <?= $link['icon'] ?>
+        </span>
+        <span class="font-['Plus_Jakarta_Sans'] text-xs font-semibold">
+          <?= $link['name'] ?>
+        </span>
+      </a>
+    <?php endforeach; ?>
   </nav>
 </body>
 

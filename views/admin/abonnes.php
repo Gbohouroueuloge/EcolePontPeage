@@ -300,7 +300,7 @@ $title = "Abonnés";
   </section>
 
   <!-- Fenêtre modale de confirmation de renouvellement -->
-  <div class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-100 flex items-center justify-center">
+  <div class="fixed hidden inset-0 bg-primary/60 backdrop-blur-sm z-100 flex items-center justify-center">
     <div class="bg-surface-container-lowest w-full max-w-lg rounded-lg shadow-2xl overflow-hidden">
       <div class="bg-primary p-8 text-white">
         <div class="flex items-center gap-3 mb-2">

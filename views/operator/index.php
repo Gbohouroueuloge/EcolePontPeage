@@ -21,7 +21,7 @@ $title = 'Passage';
       </div>
     </div>
   </div>
-  
+
   <div class="grow flex flex-col p-8 gap-8 items-center xl:justify-center max-w-7xl mx-auto w-full">
     <!-- Central Display Section -->
     <div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -57,11 +57,12 @@ $title = 'Passage';
             <span class="font-headline font-bold text-xs uppercase tracking-wider">Moto (Cat 1)</span>
           </div>
 
-          <button
+          <a
+            href="operator/incident"
             class="flex items-center gap-3 bg-error hover:bg-error/80 text-white px-8 py-3 rounded-full shadow-[0_8px_15px_rgba(61,58,140,0.3)]">
             <span class="material-symbols-outlined">error</span>
             <span class="font-headline font-bold text-xs uppercase tracking-wider">Signaler un incident</span>
-          </button>
+          </a>
         </div>
       </div>
       <!-- Transaction Summary -->
