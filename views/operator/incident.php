@@ -1,6 +1,6 @@
 <?php
 $title = 'Incident';
-
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 ?>
 
 <!-- Urgency Alert Banner -->

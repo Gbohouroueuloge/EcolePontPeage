@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8">
@@ -41,6 +41,7 @@
         </div>
       </div>
     </header>
+
     <!-- Main Content Canvas -->
     <main class="grow flex flex-col items-center justify-center px-6 py-12">
       <div class="max-w-4xl w-full flex flex-col items-center text-center space-y-12">
@@ -139,6 +140,7 @@
         </div>
       </div>
     </main>
+
     <!-- Footer -->
     <footer class="bg-primary-container text-white pt-24 pb-0 relative">
       <!-- 4px gold geometric band -->

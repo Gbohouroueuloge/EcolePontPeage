@@ -1,23 +1,33 @@
 <?php
 $title = 'Passage';
 
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
+
 ?>
 
 <main class="pt-16 mb-24 min-h-screen flex flex-col">
   <!-- Status Bar -->
   <div class="h-16 bg-brand-success flex items-center justify-between px-8 text-white shadow-lg">
     <div class="flex items-center gap-4">
-      <span class="material-symbols-outlined text-3xl"
-        style="font-variation-settings: 'FILL' 1;">door_open</span>
-      <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE OUVERTE</span>
+      <?php if ($agent->debut !== null) : ?>
+        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
+          door_open
+        </span>
+        <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE OUVERTE</span>
+      <?php else : ?>
+        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
+          door_front
+        </span>
+        <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE FERMEE</span>
+      <?php endif; ?>
     </div>
     <div class="flex items-center gap-6">
       <div class="hidden md:flex items-center gap-2">
         <div class="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
-        <span class="font-mono text-sm opacity-90 tracking-tighter">SENS: NORD-SUD</span>
+        <span class="font-mono text-sm opacity-90 tracking-tighter">SENS: <?= $guichet->emplacement ?></span>
       </div>
       <div class="bg-white/20 px-4 py-1 rounded-sm border border-white/30">
-        <span class="font-mono text-sm font-bold uppercase tracking-widest">Poste #882</span>
+        <span class="font-mono text-sm font-bold uppercase tracking-widest">Poste #<?= $guichet->id ?></span>
       </div>
     </div>
   </div>

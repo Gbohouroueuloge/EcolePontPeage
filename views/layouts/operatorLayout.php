@@ -1,11 +1,23 @@
 <?php
+
+$url = $params['username'] . '-' . $params['id'];
+
 $navLinks = [
-  ['name' => "Passage", 'href' => "/operator", 'icon' => "directions_car"],
-  ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
-  ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
-  ['name' => "Mon Shift", 'href' => "/operator/mon-shift", 'icon' => "schedule"],
+  ['name' => "Passage", 'href' => "/operator/$url", 'icon' => "directions_car"],
+  ['name' => "Caisse", 'href' => "/operator/$url/caisse", 'icon' => "payments"],
+  ['name' => "Incident", 'href' => "/operator/$url/incident", 'icon' => "warning"],
+  ['name' => "Mon Shift", 'href' => "/operator/$url/mon-shift", 'icon' => "schedule"],
 ];
 
+$isConnected = $auth->isConnected();
+
+if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user->username) {
+  http_response_code(301);
+  header('Location: /404');
+  exit();
+}
+
+// dd($agent, $guichets);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -13,7 +25,7 @@ $navLinks = [
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Operator <?= $title ?? 'Péage Bridge' ?></title>
   <link rel="stylesheet" href="/output.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;family=Public+Sans:wght@400;500;600&amp;family=Inter:wght@400;600;700&amp;display=swap"
@@ -47,7 +59,7 @@ $navLinks = [
       <div class="hidden md:flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg">
         <span class="material-symbols-outlined text-primary"
           style="font-variation-settings: 'FILL' 1;">sensors</span>
-        <span class="font-bold text-primary">Lane 04 Active</span>
+        <span class="font-bold text-primary">Voie #<?= $guichet->id ?> Active</span>
       </div>
       <div class="flex items-center gap-2">
         <button
@@ -61,9 +73,15 @@ $navLinks = [
         <a href="/" class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
           <span class="material-symbols-outlined text-slate-600">home</span>
         </a>
-        <div class="hidden md:flex items-center w-8 h-8 rounded-full overflow-hidden ml-2 ring-2 ring-surface-container-highest">
-          <img alt="Operator Avatar" class="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhvaV1U3ZLl4gdG95-OiIPrCe41blG3YoExDuAOXxv6shfPSGJt_JaWYMXuLsGdT5YHfIMb50LSBGAUNaxaQZkorHlNchAEVx9XUVHdB1ulfWGgP-rgWktZlXpWHqTWHeaRO2kgTRu5lIEAu8GSMkOpw3fVWctPBOSNOZIKCKWcBpb3gyJBNUdPhTu1kiwOGUIA2Stv6h2YPrR9WX4DLo0N_kUHuh24Co5jfwhNRg7joQVhKdhJu8CzCA30jQqy67wIQMnS-zdMn0V" />
+        <div
+          class="relative inline-flex group cursor-pointer">
+          <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
+            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+              <?= substr($agent->username, 0, 2) ?>
+            </span>
+          </div>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
         </div>
       </div>
     </div>

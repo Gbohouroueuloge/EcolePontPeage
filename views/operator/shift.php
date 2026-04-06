@@ -1,6 +1,29 @@
 <?php
 $title = 'Mon Shift';
 
+use App\Models\User;
+use App\Models\Agent;
+use App\Models\Guichet;
+
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
+
+/** @var User */
+$user = $user;
+
+/** @var Agent */
+$agent = $agent;
+
+/** @var Guichet */
+$guichet = $guichet;
+
+if (isset($_GET['close'])) {
+  $pdo->prepare("UPDATE agent SET fin = NOW() WHERE id = :id")->execute(['id' => $agent->id]);
+
+  http_response_code(301);
+  header("Location : /operator/$params[username]-$params[id]");
+  exit();
+}
+
 ?>
 
 <main class="pt-24 px-4 md:px-8 mb-24 max-w-7xl mx-auto">
@@ -12,22 +35,26 @@ $title = 'Mon Shift';
         <span class="material-symbols-outlined text-3xl">schedule</span>
       </div>
       <div>
-        <h2 class="text-white font-headline font-bold text-lg leading-tight">Shift Actuel : Matinée</h2>
-        <p class="text-on-tertiary-container text-sm font-medium tracking-wide">DÉBUTÉ À 06:00 • 24 MAI 2024
+        <h2 class="text-white font-headline font-bold text-lg leading-tight">
+          Shift Actuel : <?= date('H\h:i') ?>
+        </h2>
+        <p class="text-on-tertiary-container text-sm font-medium tracking-wide">
+          DÉBUTÉ À <?= $agent->getDateDebut()->format('H\h:i') ?> • <?= $agent->fin ? 'FINI À ' . $agent->getDateFin()->format('H\h:i') : 'EN COURS' ?>
         </p>
       </div>
     </div>
     <div class="flex gap-2">
       <span
         class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-md text-xs font-bold font-headline flex items-center gap-1">
-        <span class="material-symbols-outlined text-sm animate-pulse" style="font-variation-settings: 'FILL' 1">fiber_manual_record</span>
-        EN COURS
+        <span class="material-symbols-outlined text-sm <?= !$agent->fin ? 'animate-pulse' : '' ?>" style="font-variation-settings: 'FILL' 1">fiber_manual_record</span>
+        <?= $agent->fin ? 'FINI' : 'EN COURS' ?>
       </span>
       <span class="px-3 py-1 bg-brand-indigo text-white rounded-md text-xs font-bold text-center font-headline">
-        VOIE 04A
+        VOIE #<?= $guichet->id ?>
       </span>
     </div>
   </section>
+
   <!-- KPI Cards Grid -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
     <!-- Passages Card -->
@@ -157,54 +184,56 @@ $title = 'Mon Shift';
         </table>
       </div>
     </div>
+
     <!-- Profile Section -->
     <div class="space-y-6">
       <h3 class="font-headline font-extrabold text-2xl tracking-tight text-primary">Mon Profil</h3>
       <div
         class="bg-surface-container-lowest p-8 rounded-xl ghost-border flex flex-col items-center text-center">
         <div class="relative mb-4">
-          <img alt="Operator Photo"
-            class="w-24 h-24 rounded-full border-4 border-surface-container shadow-md"
-            data-alt="Detailed portrait of a senior toll bridge operator in a crisp uniform, soft studio lighting, professional headshot style"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxQdfn5eaEx3S6ACAmfsml6_4KSNO13-xonLdiKdAS2INOx8IEFrG6Tt6Z4A1H9DUQPE5egmRTHvOYo7_SGFgyj0crBOMrVKK-cP766jaW_BvbfZBe1zbPzWG2Rctp5siPL-SUpFB9Di1czjLMlKG6ODl1qI_dqcwUASe0EFGvt3UvUxflVXVv2BPBOHVSYbcsTkY4fFW0hc59tn44w1uce3xnSGtlTQkMHYqNU6UcLO8btdr-0OODY6T4iONS1O6D1m9hNy1MXJvV" />
           <div
-            class="absolute bottom-0 right-0 p-2 bg-brand-indigo text-white rounded-full border-2 border-white">
+            class="relative inline-flex group cursor-pointer">
+            <div class="flex items-center justify-center w-24 h-24 rounded-full overflow-hidden border-2 border-surface-container-high bg-secondary-container shadow-sm transition-all duration-300 group-hover:shadow-md">
+              <span class="text-primary uppercase text-5xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+                <?= substr($agent->username, 0, 2) ?>
+              </span>
+            </div>
+          </div>
+
+          <div class="absolute -bottom-3 -right-2 p-1.5 bg-brand-indigo text-white rounded-full">
             <span class="material-symbols-outlined text-sm">edit</span>
           </div>
         </div>
-        <h4 class="font-headline font-bold text-xl text-primary">Abdoulaye Diallo</h4>
-        <span
-          class="mt-1 px-3 py-0.5 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full uppercase tracking-widest">Opérateur
-          Senior</span>
+        <h4 class="font-headline font-bold text-xl text-primary">
+          <?= $agent->username ?>
+        </h4>
         <div class="w-full mt-8 space-y-4 text-left">
           <div class="space-y-1">
             <label
-              class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Identifiant
-              Agent</label>
+              class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+              Identifiant Agent
+            </label>
             <div
               class="p-3 bg-surface-container-low rounded-lg mono-data text-sm font-bold text-primary">
-              OPS-244-08</div>
+              #<?= $agent->id ?>
+            </div>
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Email
               Professionnel</label>
             <div class="p-3 bg-surface-container-low rounded-lg text-sm text-on-surface">
-              a.diallo@tollops.infra</div>
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Gare
-              d'affectation</label>
-            <div class="p-3 bg-surface-container-low rounded-lg text-sm text-on-surface font-medium">
-              Gare de Thiaroye (Zone A)</div>
+              <?= $agent->email ?>
+            </div>
           </div>
         </div>
       </div>
       <!-- Action Buttons -->
       <div class="flex flex-col gap-3">
-        <button
-          class="w-full py-4 rounded-xl border-2 border-primary text-primary font-headline font-bold text-sm tracking-wide hover:bg-primary hover:text-white transition-all">
+        <a
+          href="?close"
+          class="w-full flex items-center justify-center py-4 rounded-xl border-2 border-primary text-primary font-headline font-bold text-sm tracking-wide hover:bg-primary hover:text-white transition-all">
           Clôturer le shift
-        </button>
+        </a>
         <button
           class="w-full py-4 rounded-xl bg-[#FF6B6B] text-white font-headline font-bold text-sm tracking-wide shadow-lg hover:brightness-95 transition-all">
           Se déconnecter

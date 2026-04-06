@@ -1,3 +1,27 @@
+<?php
+
+use App\Auth;
+use App\Components\Notification;
+use App\ConnectionBDD;
+
+$auth = new Auth(ConnectionBDD::getPdo());
+
+$error = null;
+
+if (!empty($_POST)) {
+  $user = $auth->login($_POST['email'], $_POST['password']);
+
+  if ($user) {
+    header('Location: /');
+    exit();
+  } else {
+    $error = 'Adresse e-mail ou mot de passe incorrect.';
+  }
+}
+
+?>
+
+
 <main class="flex md:min-h-screen">
   <!-- Left Side: Login Form -->
   <section
@@ -8,30 +32,30 @@
         <h1 class="font-outfit text-[32px] font-bold text-primary leading-tight mb-2">Bon retour 👋</h1>
         <p class="font-dmsans text-[16px] text-on-surface-variant">Connectez-vous à votre espace.</p>
       </header>
-      <form class="space-y-6">
+
+      <?php if ($error) : ?>
+        <?= Notification::display($error, 'error'); ?>
+      <?php endif; ?>
+
+      <form class="space-y-6" action="/login" method="post">
         <div>
-          <label class="block text-sm font-label font-medium text-on-surface mb-2" for="email">Adresse
-            e-mail</label>
+          <label class="block text-sm font-label font-medium text-on-surface mb-2" for="email">
+            Adresse e-mail
+          </label>
           <input
-            class="w-full px-4 py-3 bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-secondary-container rounded-lg font-body transition-all duration-200 outline-none"
-            id="email" name="email" placeholder="nom@entreprise.fr" type="email" />
+            class="w-full px-4 py-3 <?= $error ? 'border-2 border-red-500' : '' ?> bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-secondary-container rounded-lg font-body transition-all duration-200 outline-none"
+            id="email" name="email" placeholder="exemple@email.com" type="email"
+            value="<?= $_POST['email'] ?? '' ?>" />
         </div>
 
         <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="block text-sm font-label font-medium text-on-surface" for="password">Mot de
-              passe</label>
-          </div>
-          <div class="relative">
-            <input
-              class="w-full px-4 py-3 bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-secondary-container rounded-lg font-body transition-all duration-200 outline-none"
-              id="password" name="password" placeholder="••••••••" type="password" />
-            <button
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
-              type="button">
-              <span class="material-symbols-outlined text-[20px]">visibility</span>
-            </button>
-          </div>
+          <label class="block text-sm font-label font-medium text-on-surface mb-2" for="password">
+            Mot de passe
+          </label>
+          <input
+            class="w-full px-4 py-3 <?= $error ? 'border-2 border-red-500' : '' ?> bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-secondary-container rounded-lg font-body transition-all duration-200 outline-none"
+            id="password" name="password" placeholder="Votre mot de passe" type="password"
+            value="<?= $_POST['email'] ?? '' ?>" />
         </div>
 
         <div class="flex items-center justify-between">
@@ -43,12 +67,14 @@
               Se souvenir de moi
             </label>
           </div>
+
           <div class="text-sm">
-            <a class="font-medium text-[#FF7F50] hover:opacity-80 transition-opacity" href="#">
+            <a class="font-medium text-[#FF7F50] hover:opacity-80 transition-opacity" href="?reset">
               Mot de passe oublié ?
             </a>
           </div>
         </div>
+
         <div>
           <button
             class="w-full bg-primary text-on-primary font-label font-semibold py-4 rounded-lg hover:bg-secondary transition-all duration-300 active:scale-[0.98] gold-glow uppercase tracking-widest text-xs"
@@ -75,6 +101,7 @@
       </div>
     </div>
   </section>
+
   <!-- Right Side: Brand Imagery & Stats -->
   <section
     class="hidden lg:flex w-1/2 bg-primary relative flex-col justify-center items-center p-24 overflow-hidden">

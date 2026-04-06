@@ -1,9 +1,21 @@
 <?php
+
+use App\Auth;
+use App\ConnectionBDD;
+
 $navLinks = [
   ['label' => "Tarifs", 'href' => "/tarifs", 'icon' => "directions_car"],
   ['label' => "Abonnements", 'href' => "/abonnements", 'icon' => "payments"],
   ['label' => "Contact", 'href' => "/contact", 'icon' => "email"],
-]
+];
+
+$auth = new Auth(ConnectionBDD::getPdo());
+
+$isconnected = Auth::isConnected();
+$isAdmin = $auth->isAdmin();
+
+$user = $auth->getUser();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,23 +61,49 @@ $navLinks = [
         <?php endforeach; ?>
       </nav>
 
-      <div class="flex items-center gap-3">
+      <?php if ($isAdmin) : ?>
         <a
-          href="/login"
-          class="px-5 py-2.5 rounded-lg border border-primary/10 font-headline font-bold text-primary hover:bg-primary hover:text-on-primary transition-all">
-          Connexion
+          href="/admin/<?= $user->username . '-' . $user->id ?>"
+          class="relative inline-flex group cursor-pointer">
+          <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high bg-primary shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
+            <span class="text-on-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+              <?= substr($user->username, 0, 2) ?>
+            </span>
+          </div>
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
         </a>
+      <?php elseif ($isconnected): ?>
         <a
-          href="/register"
-          class="px-5 py-2.5 rounded-lg bg-secondary-container text-primary font-headline font-bold gold-glow hover:bg-secondary hover:text-on-secondary transition-all">
-          S'inscrire
+          href="/operator/<?= $user->username . '-' . $user->id ?>"
+          class="relative inline-flex group cursor-pointer">
+          <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
+            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+              <?= substr($user->username, 0, 2) ?>
+            </span>
+          </div>
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
         </a>
-      </div>
+      <?php else: ?>
+        <div class="flex items-center gap-3">
+          <a
+            href="/login"
+            class="px-5 py-2.5 rounded-lg border border-primary/10 font-headline font-bold text-primary hover:bg-primary hover:text-on-primary transition-all">
+            Connexion
+          </a>
+          <a
+            href="/register"
+            class="px-5 py-2.5 rounded-lg bg-secondary-container text-primary font-headline font-bold gold-glow hover:bg-secondary hover:text-on-secondary transition-all">
+            S'inscrire
+          </a>
+        </div>
+      <?php endif; ?>
     </div>
   </header>
 
   <?= $content ?>
-  
+
   <!-- Footer -->
   <footer class="bg-primary-container text-white pt-24 pb-0 relative">
     <!-- 4px gold geometric band -->
