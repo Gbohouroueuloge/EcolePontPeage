@@ -1,12 +1,23 @@
 <?php
 $title = "Dashboard";
 
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
+
 $notifications = [
   ['title' => "Paiement Validé - Plaque [AA-456-ZZ]", 'text' => "14:42:05 • 8 200 FCFA • Cabine 04", 'type' => "payments", 'color' => ["bg-secondary-container", "text-primary"]],
   ['title' => "Refus de Passage - Badge Invalide", 'text' => "14:39:12 • Voie Express 02", 'type' => "report", 'color' => ["bg-error-container", "text-error"]],
   ['title' => "Agent Jean D. en Pause", 'text' => "14:35:00 • Relève Secteur Sud", 'type' => "person", 'color' => ["bg-surface-container-highest", "text-primary"]],
   ['title' => "Check-up Capteur Laser L04", 'text' => "14:28:10 • Statut: Opérationnel", 'type' => "visibility", 'color' => ["bg-surface-container-highest", "text-primary"]],
 ];
+
+/** @var PDO */
+$pdo = $pdo;
+
+$query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id = u.id WHERE fin IS NULL");
+$query->execute([]);
+$agentsCours = $query->fetchAll();
+
+// dd($agentsCours);
 
 ?>
 
@@ -20,7 +31,7 @@ $notifications = [
       Tableau de Bord Opérationnel
     </h2>
     <p class="text-on-surface-variant font-headline">
-      Surveillance en temps réel du Pont de la Monolithe • 24 Octobre 2023
+      Surveillance en temps réel du Pont • <?= date('d/m/Y') ?>
     </p>
   </div>
 
@@ -74,23 +85,26 @@ $notifications = [
     <div
       class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,7,25,0.03)] border-l-4 border-tertiary">
       <div class="flex justify-between items-start mb-4">
-        <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Agents en
-          service</span>
+        <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Agents en service</span>
         <span class="material-symbols-outlined text-tertiary">group</span>
       </div>
-      <div class="font-mono text-4xl font-bold text-primary mb-4">18</div>
-      <div class="flex -space-x-3 overflow-hidden">
-        <img alt="" class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtQKgTDnPOnXwzZ689GAywSQlaAYK3stYp9W3LlNu-_s0BonYXh8IcQFZnaIBcLkrw50LpgOXdCSulehwhYhvLGgPK60tkNARhEqQ7uVsnrTJkO6Hy_A3gVocUifHN_yb2HAp1_O3_dIOvQROmG7ZbIJCQ6wW2UzUkXeF6ggH917EIrMZynqVSeaZPVQxdBnzr8827rrtbUe4hoxfu5eVz5beo3fprlEiA5hB6G7L-eZ-_aYPkI8e1KbH87o8WNMDp11z7io-0JxSR" />
-        <img alt="" class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1Kme2yKn08LDYHwlaxEusnrkC7uPvnoxjjriFA66p-WVJCj56ubJpjwnbHD-dzDSGFg1W5LzThszQXARD2AEQCBywtzKOOXNnfVTXCZmR2Q8gwO2NN6c7W6jEbekXnMJMFTQjAwipdxkwBer6d4XKjBGjffO_hiaIjLjf4VtwzkZHddNT09li4dy8FQchiVzYVKJoYtduoSiFKCiLxqVgAB4OcuOZ0Wcgy2qKbUm2oFIwBEn18rwMoMMAoJAvewmN-IGxzexu2UlP" />
-        <img alt="" class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0fdX02jHjkNNCD-GOlHdTJuBPDmOGFyObqSxHECKCAwCOlzgt0wZK5vifCmog-fPUnmoa1KJVDc4ORhWhX9YzidpzpOVSlaOwVpoIJD-uNaniCNMJLbvuTQXcfj68rN4ETtGgPQppT2X37awQ_wgy2uysgdakQIY-rRMW19yz0F54x5Kkxndl1jOhp2zfGd8iYs_q5YDfGaowdY-59ptFxq8N5f9Nws0yOK0IOGQULT34k-9xySfdm490tfdUptXwhzO4va9aaT0q" />
-        <img alt="" class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcJTXiwF3bXM0x3K7qavJ80C2g5TjH9D85NEYvVD6-GHZ_OPCi7hZ4MASZ8vlTCz7tTzeLyIgD6cYTOawIBQPAcZ6vsKZ7ghilV5CXU7zw6402oRT_R_3GtnnwFEDfQBZ1C_l49zfHc3--IbFwdpLFeqUwLrfxHI7ktkIzPFwvUNviWvzS6GjxziOJDuTIsjKNpf9gu03KlKOAFB9YPMlBJPOaHMIifuRtxxZ28_sLvNVA1kbm22jaL9WBroRz6QJrDx_HskMbMFwT" />
-        <div
-          class="inline-block h-10 w-10 rounded-full bg-surface-container-highest items-center justify-center text-[10px] font-bold ring-2 ring-white">
-          +14</div>
+      <div class="font-mono text-4xl font-bold text-primary mb-4"><?= count($agentsCours) ?></div>
+      <div class="flex -space-x-2 overflow-hidden">
+        <?php foreach ($agentsCours as $k => $agent): ?>
+          <?php if ($k > 4) break; ?>
+          <div
+            class="inline-flex items-center justify-center border-2 border-surface-container-high  overflow-hidden h-10 w-10 rounded-full ring-2 bg-surface-container-high ring-white group">
+            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+              <?= substr($agent['username'], 0, 2) ?>
+            </span>
+          </div>
+        <?php endforeach ?>
+        <?php if (count($agentsCours) > 5): ?>
+          <div
+            class="inline-flex h-10 w-10 rounded-full bg-surface-container-highest items-center justify-center text-[14px] font-bold ring-2 ring-white">
+            +<?= count($agentsCours) - 5 ?>
+          </div>
+        <?php endif ?>
       </div>
     </div>
 

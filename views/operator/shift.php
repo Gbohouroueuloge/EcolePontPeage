@@ -1,6 +1,7 @@
 <?php
 $title = 'Mon Shift';
 
+use App\Components\Notification;
 use App\Models\User;
 use App\Models\Agent;
 use App\Models\Guichet;
@@ -24,6 +25,22 @@ if (isset($_GET['close'])) {
   exit();
 }
 
+if (isset($_GET['open'])) {
+  $pdo->prepare("UPDATE agent SET debut = NOW(), fin = NULL WHERE id = :id")->execute(['id' => $agent->id]);
+
+  http_response_code(301);
+  header("Location : /operator/$params[username]-$params[id]/mon-shift");
+  exit();
+}
+
+if (isset($_GET['logout'])) {
+  $auth->logout();
+
+  http_response_code(301);
+  header("Location : /");
+  exit();
+}
+
 ?>
 
 <main class="pt-24 px-4 md:px-8 mb-24 max-w-7xl mx-auto">
@@ -39,15 +56,15 @@ if (isset($_GET['close'])) {
           Shift Actuel : <?= date('H\h:i') ?>
         </h2>
         <p class="text-on-tertiary-container text-sm font-medium tracking-wide">
-          DÉBUTÉ À <?= $agent->getDateDebut()->format('H\h:i') ?> • <?= $agent->fin ? 'FINI À ' . $agent->getDateFin()->format('H\h:i') : 'EN COURS' ?>
+          DÉBUTÉ À <?= $agent->getDateDebut()->format('H\h:i') ?> • <?= $agent->is_en_cours() ? 'EN COURS' : 'FINI À ' . $agent->getDateFin()->format('H\h:i')  ?>
         </p>
       </div>
     </div>
     <div class="flex gap-2">
       <span
         class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-md text-xs font-bold font-headline flex items-center gap-1">
-        <span class="material-symbols-outlined text-sm <?= !$agent->fin ? 'animate-pulse' : '' ?>" style="font-variation-settings: 'FILL' 1">fiber_manual_record</span>
-        <?= $agent->fin ? 'FINI' : 'EN COURS' ?>
+        <span class="material-symbols-outlined text-sm <?= $agent->is_en_cours() ? 'animate-pulse' : '' ?>" style="font-variation-settings: 'FILL' 1">fiber_manual_record</span>
+        <?= $agent->is_en_cours() ? 'EN COURS' : 'FINI' ?>
       </span>
       <span class="px-3 py-1 bg-brand-indigo text-white rounded-md text-xs font-bold text-center font-headline">
         VOIE #<?= $guichet->id ?>
@@ -98,6 +115,7 @@ if (isset($_GET['close'])) {
       </div>
     </div>
   </div>
+
   <!-- Two Column Layout: Table & Profile -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <!-- Compact History Table -->
@@ -227,17 +245,27 @@ if (isset($_GET['close'])) {
           </div>
         </div>
       </div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col gap-3">
+        <?php if ($agent->is_en_cours()) : ?>
+          <a
+            href="?close"
+            class="w-full flex items-center justify-center py-4 rounded-xl border-2 border-primary text-primary font-headline font-bold text-sm tracking-wide hover:bg-primary hover:text-white transition-all">
+            Fermer la voie
+          </a>
+        <?php else : ?>
+          <a
+            href="?open"
+            class="w-full flex items-center justify-center py-4 rounded-xl border-2 border-on-secondary text-on-secondary font-headline font-bold text-sm tracking-wide bg-secondary-container hover:bg-primary transition-all">
+            Ouvrir la voie
+          </a>
+        <?php endif; ?>
         <a
-          href="?close"
-          class="w-full flex items-center justify-center py-4 rounded-xl border-2 border-primary text-primary font-headline font-bold text-sm tracking-wide hover:bg-primary hover:text-white transition-all">
-          Clôturer le shift
-        </a>
-        <button
-          class="w-full py-4 rounded-xl bg-[#FF6B6B] text-white font-headline font-bold text-sm tracking-wide shadow-lg hover:brightness-95 transition-all">
+          href="?logout"
+          class="w-full flex items-center justify-center py-4 rounded-xl bg-[#FF6B6B] text-white font-headline font-bold text-sm tracking-wide shadow-lg hover:brightness-95 transition-all">
           Se déconnecter
-        </button>
+        </a>
       </div>
     </div>
   </div>

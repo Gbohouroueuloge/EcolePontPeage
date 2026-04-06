@@ -1,15 +1,19 @@
 <?php
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
+
+$url = $params['username'] . '-' . $params['id'];
+
 $navLinks = [
   ['text' => "Vue générale", "isTitle" => true],
-  ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => '', 'isTitle' => false],
-  ['text' => "Historiques", 'icon' => 'history', 'link' => '/historiques', 'isTitle' => false],
+  ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => "/$url", 'isTitle' => false],
+  ['text' => "Historiques", 'icon' => 'history', 'link' => "/$url/historiques", 'isTitle' => false],
   ['text' => "Gestion", 'isTitle' => true],
-  ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => '/flux-trafic', 'isTitle' => false],
-  ['text' => "Abonnés", 'icon' => 'group', 'link' => '/abonnes', 'isTitle' => false],
+  ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => "/$url/flux-trafic", 'isTitle' => false],
+  ['text' => "Abonnés", 'icon' => 'group', 'link' => "/$url/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
-  ['text' => "Operators", 'icon' => 'engineering', 'link' => '/operateurs', 'isTitle' => false],
-  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => '/rapports', 'isTitle' => false],
-  ['text' => "Paramètres", 'icon' => 'settings', 'link' => '/parametres', 'isTitle' => false],
+  ['text' => "Operators", 'icon' => 'engineering', 'link' => "/$url/operateurs", 'isTitle' => false],
+  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/$url/rapports", 'isTitle' => false],
+  ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/$url/parametres", 'isTitle' => false],
 ];
 
 ?>
@@ -42,91 +46,13 @@ $navLinks = [
   <!-- SideNavBar Mobile -->
   <aside id="sidebarMobile"
     class="fixed md:hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)] -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-    <div class="p-8 py-4 flex items-center gap-3">
-      <div class="w-8 h-8 bg-secondary-container rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(254,190,73,0.4)]">
-        <span class="material-symbols-outlined text-primary -rotate-45 text-sm">link</span>
-      </div>
-      <h1 class="text-xl font-bold tracking-tight text-white font-headline">Péage Bridge</h1>
-    </div>
-
-    <nav class="flex-1 mt-2 px-0">
-      <?php foreach ($navLinks as $link) : ?>
-        <?php if ($link['isTitle']) : ?>
-          <div class="px-6 py-2">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 font-headline"><?= $link['text'] ?></p>
-          </div>
-        <?php else: ?>
-          <a
-            href="/admin<?= $link['link'] ?>"
-            class="flex items-center gap-3 px-6 py-2 mb-2 <?= $title === $link['text'] ? ' text-secondary-container border-l-4 border-secondary-container bg-white/5 active-nav-glow ' : ' hover:bg-white/10 text-slate-400 hover:text-white ' ?> transition-all group">
-            <span class="material-symbols-outlined text-lg"><?= $link['icon'] ?></span>
-            <span class="font-medium text-sm"><?= $link['text'] ?></span>
-          </a>
-        <?php endif ?>
-      <?php endforeach; ?>
-    </nav>
-
-    <div class="p-6 bg-white/5 mt-auto">
-      <div class="flex items-center gap-3">
-        <img alt="Admin User Profile" class="w-10 h-10 rounded-lg object-cover ring-1 ring-white/20"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAahXG2huCNHN-s9fl3WxsNMoI_wO9zb0BURxV-A3Aif0qSroOlLY-RNGubo5osUgLkbyVS9NcMj5ltYF7ZHdtHF-G8Mp6F0GyLjYIsAsGqstZsu6rtZjfjxF1BQ955Su3gy7Wn3H78_SxIVe2rKvFUU0J7i7-pgL_lZRy5LhqCwWrsh_l7q6yc4GMbVZMDdJeBxqk2iNGJ5kDmvsoA7sfVWnX9R_zjd8mC8SRvpyMo5gpnyH89CHQXEEMxnmy31PkviN7VUj6NVqfY" />
-        <div>
-          <p class="text-xs font-bold text-white leading-none">Admin User</p>
-          <p class="text-[10px] text-slate-400 mt-1">Infrastructure Admin</p>
-        </div>
-      </div>
-      <div class="mt-4 pt-4 border-t border-white/10">
-        <div class="flex items-center gap-2 text-[10px] text-secondary-container font-bold">
-          <span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
-          System Health: Optimal
-        </div>
-      </div>
-    </div>
+    <?= require 'asideAdmin.php' ?>
   </aside>
 
   <!-- SideNavBar -->
   <aside
     class="fixed hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 md:flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)]">
-    <div class="p-8 py-4 flex items-center gap-3">
-      <div class="w-8 h-8 bg-secondary-container rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(254,190,73,0.4)]">
-        <span class="material-symbols-outlined text-primary -rotate-45 text-sm">link</span>
-      </div>
-      <h1 class="text-xl font-bold tracking-tight text-white font-headline">Péage Bridge</h1>
-    </div>
-
-    <nav class="flex-1 mt-2 px-0">
-      <?php foreach ($navLinks as $link) : ?>
-        <?php if ($link['isTitle']) : ?>
-          <div class="px-6 py-2">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 font-headline"><?= $link['text'] ?></p>
-          </div>
-        <?php else: ?>
-          <a
-            href="/admin<?= $link['link'] ?>"
-            class="flex items-center gap-3 px-6 py-2 mb-2 <?= $title === $link['text'] ? ' text-secondary-container border-l-4 border-secondary-container bg-white/5 active-nav-glow ' : ' hover:bg-white/10 text-slate-400 hover:text-white ' ?> transition-all group">
-            <span class="material-symbols-outlined text-lg"><?= $link['icon'] ?></span>
-            <span class="font-medium text-sm"><?= $link['text'] ?></span>
-          </a>
-        <?php endif ?>
-      <?php endforeach; ?>
-    </nav>
-    <div class="p-6 bg-white/5 mt-auto">
-      <div class="flex items-center gap-3">
-        <img alt="Admin User Profile" class="w-10 h-10 rounded-lg object-cover ring-1 ring-white/20"
-          data-alt="Professional headshot of a mature administrative manager in a dark suit with a clean background"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAahXG2huCNHN-s9fl3WxsNMoI_wO9zb0BURxV-A3Aif0qSroOlLY-RNGubo5osUgLkbyVS9NcMj5ltYF7ZHdtHF-G8Mp6F0GyLjYIsAsGqstZsu6rtZjfjxF1BQ955Su3gy7Wn3H78_SxIVe2rKvFUU0J7i7-pgL_lZRy5LhqCwWrsh_l7q6yc4GMbVZMDdJeBxqk2iNGJ5kDmvsoA7sfVWnX9R_zjd8mC8SRvpyMo5gpnyH89CHQXEEMxnmy31PkviN7VUj6NVqfY" />
-        <div>
-          <p class="text-xs font-bold text-white leading-none">Admin User</p>
-          <p class="text-[10px] text-slate-400 mt-1">Infrastructure Admin</p>
-        </div>
-      </div>
-      <div class="mt-4 pt-4 border-t border-white/10">
-        <div class="flex items-center gap-2 text-[10px] text-secondary-container font-bold">
-          <span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
-          System Health: Optimal
-        </div>
-      </div>
-    </div>
+    <?= require 'asideAdmin.php' ?>
   </aside>
 
   <!-- TopAppBar -->
@@ -156,14 +82,23 @@ $navLinks = [
       </div>
       <div class="flex items-center gap-4">
         <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">notifications</button>
-        <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">settings</button>
+        <a href="/admin/<?= $url ?>/parametres" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
+          settings
+        </a>
         <a href="/" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
           home
         </a>
-        <div class="hidden md:flex items-center gap-2 w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high">
-          <img alt="Profil Administrateur"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT9tfpgGi8Dk5Y5hxfW_PIgncPN3pIxRiZrMIcV5ODJ8DDRu3WqY9JLE1PUSUO0yuy-gLxcdW1w1A7VSTO3i-NdndDnlCZNrfJfERD-hqNULTTw6fNq8MTr9ZPpSrO8fLgYWm7C_X72B2YMtiZQMv41tL_rWragtdTo69ENZYn8PeQApsEDJ9-4F72WFYzQpISzgc470ZM827_TKgE26M1K9oiZER9KSmfUO8CnuTtwaGmicnpTgu0Oj9xYezSXg_yh7skm78PtJCL" />
-        </div>
+        <a
+          href="/admin/<?= $url ?>/parametres"
+          class="relative hidden md:inline-flex group cursor-pointer">
+          <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
+            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+              <?= substr($user->username, 0, 2) ?>
+            </span>
+          </div>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
+        </a>
       </div>
     </div>
   </header>

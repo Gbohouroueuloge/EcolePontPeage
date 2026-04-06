@@ -1,6 +1,5 @@
 <?php
 $title = 'Caisse';
-require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 ?>
 
 <main class="pt-20 pb-24 px-4 min-h-screen max-w-4xl mx-auto flex flex-col">

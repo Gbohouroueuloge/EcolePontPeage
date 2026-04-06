@@ -1,6 +1,23 @@
 <?php
+
+use App\Models\Guichet;
+
 $title = "Historiques";
 
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
+
+/** @var PDO */
+$pdo = $pdo;
+
+$query = $pdo->prepare("SELECT * FROM guichet ORDER BY created_at DESC");
+$query->execute();
+$guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
+
+$query = $pdo->prepare("SELECT * FROM typevehicule ORDER BY created_at DESC");
+$query->execute();
+$typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
+
+// dd($typevehicules);
 ?>
 
 
@@ -36,7 +53,7 @@ $title = "Historiques";
     <!-- Filters Sticky -->
     <div class="bg-surface/95 backdrop-blur-md py-8">
       <!-- Filter Bar -->
-      <div class="bg-surface-container-low p-4 rounded-xl flex flex-wrap items-center gap-6">
+      <form action="" method="get" class="bg-surface-container-low p-4 rounded-xl flex flex-wrap items-center gap-6">
         <div class="flex-1 min-w-50">
           <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Recherche Plaque</label>
           <div class="relative">
@@ -44,57 +61,57 @@ $title = "Historiques";
               class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
             <input
               class="w-full bg-white border-none rounded-md py-2 pl-10 text-sm font-mono focus:ring-2 focus:ring-secondary-container"
-              placeholder="ABC-1234..." type="text" />
+              placeholder="ABC-1234..." type="text" name="q" />
           </div>
         </div>
-        <div>
-          <label
-            class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Période</label>
-          <div
-            class="flex items-center bg-white rounded-md px-3 py-2 text-sm text-primary cursor-pointer border-none gap-3">
-            <span class="material-symbols-outlined text-slate-400 text-sm">calendar_month</span>
-            <span>Aujourd'hui, 24 oct 2023</span>
-            <span class="material-symbols-outlined text-slate-400 text-xs">expand_more</span>
-          </div>
-        </div>
+
         <div>
           <label
             class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Voie</label>
           <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container">
-            <option>Toutes les voies</option>
-            <option>Voie 01 - Nord</option>
-            <option>Voie 02 - Nord</option>
-            <option>Voie 03 - Sud</option>
+            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
+            name="voie"
+          >
+            <option value="">Toutes les voies</option>
+            <?php foreach ($guichets as $guichet) : ?>
+              <option value="<?= $guichet->id ?>">Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?></option>
+            <?php endforeach; ?>
           </select>
         </div>
+
         <div>
           <label
             class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Catégorie</label>
           <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container">
-            <option>Toutes les classes</option>
-            <option>Classe 1 : Léger</option>
-            <option>Classe 2 : Lourd</option>
-            <option>Classe 3 : Spécial</option>
+            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
+            name="type"
+          >
+            <option value="">Toutes les classes</option>
+            <?php foreach ($typevehicules as $type) : ?>
+              <option value="<?= $type->id ?>">Cat <?= $type->id ?> - <?= $type->libelle ?></option>
+            <?php endforeach; ?>
           </select>
         </div>
+
         <div>
           <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Mode de
             Paiement</label>
           <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container">
-            <option>Tous les paiements</option>
-            <option>Abonnement</option>
-            <option>Carte Bancaire</option>
-            <option>Manuel</option>
+            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
+            name="paiement"
+          >
+            <option value="">Tous les paiements</option>
+            <option value="abonnement">Abonnement</option>
+            <option value="carte">Carte Bancaire</option>
+            <option value="manuel">Manuel</option>
           </select>
         </div>
+
         <button class="self-end p-2 flex items-center gap-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors">
           <span class="material-symbols-outlined">filter_list</span>
           Filtrer
         </button>
-      </div>
+      </form>
     </div>
 
     <!-- Data Table Section -->

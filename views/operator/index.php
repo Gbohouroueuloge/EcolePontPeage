@@ -1,7 +1,20 @@
 <?php
 $title = 'Passage';
 
+use App\Models\User;
+use App\Models\Agent;
+use App\Models\Guichet;
+
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
+
+/** @var User */
+$user = $user;
+
+/** @var Agent */
+$agent = $agent;
+
+/** @var Guichet */
+$guichet = $guichet;
 
 ?>
 
@@ -9,7 +22,7 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
   <!-- Status Bar -->
   <div class="h-16 bg-brand-success flex items-center justify-between px-8 text-white shadow-lg">
     <div class="flex items-center gap-4">
-      <?php if ($agent->debut !== null) : ?>
+      <?php if ($agent->is_en_cours()) : ?> 
         <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
           door_open
         </span>
@@ -18,7 +31,7 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
         <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
           door_front
         </span>
-        <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE FERMEE</span>
+        <span class="font-headline font-extrabold text-2xl text-red-500 tracking-widest uppercase">VOIE FERMEE</span>
       <?php endif; ?>
     </div>
     <div class="flex items-center gap-6">

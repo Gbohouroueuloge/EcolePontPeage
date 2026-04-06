@@ -1,5 +1,7 @@
 <?php
 
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
+
 $url = $params['username'] . '-' . $params['id'];
 
 $navLinks = [
@@ -43,7 +45,7 @@ if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user-
     class="flex justify-between items-center px-6 h-16 w-full fixed top-0 z-50 bg-white dark:bg-primary  font-['Plus_Jakarta_Sans'] tracking-tight">
     <div class="flex items-center gap-8">
       <span class="text-xl font-bold tracking-tighter text-primary dark:text-[#fef9f1]">
-        TollOps Monolith
+        Peage Bridge
       </span>
       <nav class="hidden md:flex gap-6 items-center h-full pt-1">
         <?php foreach ($navLinks as $link) : ?>
@@ -59,21 +61,18 @@ if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user-
       <div class="hidden md:flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg">
         <span class="material-symbols-outlined text-primary"
           style="font-variation-settings: 'FILL' 1;">sensors</span>
-        <span class="font-bold text-primary">Voie #<?= $guichet->id ?> Active</span>
+        <span class="font-bold text-primary">Voie #<?= $guichet->id ?></span>
       </div>
       <div class="flex items-center gap-2">
         <button
           class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
           <span class="material-symbols-outlined text-slate-600">notifications</span>
         </button>
-        <button
-          class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
-          <span class="material-symbols-outlined text-slate-600">settings</span>
-        </button>
         <a href="/" class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
           <span class="material-symbols-outlined text-slate-600">home</span>
         </a>
-        <div
+        <a
+          href="/operator/<?= $url ?>/mon-shift"
           class="relative inline-flex group cursor-pointer">
           <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
             <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
@@ -82,7 +81,7 @@ if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user-
           </div>
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
-        </div>
+        </a>
       </div>
     </div>
   </header>

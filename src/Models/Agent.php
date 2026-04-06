@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 class Agent extends User
@@ -15,5 +16,16 @@ class Agent extends User
   public function getDateFin(): ?\DateTime
   {
     return new \DateTime($this->fin) ?? null;
+  }
+
+  function is_en_cours()
+  {
+    $debut = $this->getDateDebut();
+    $fin = $this->getDateFin();
+
+    if ($debut->getTimestamp() <= time() && ($fin === null || $fin->getTimestamp() >= time())) {
+      return true;
+    }
+    return false;
   }
 }
