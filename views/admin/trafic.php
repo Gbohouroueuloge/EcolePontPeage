@@ -1,13 +1,21 @@
 <?php
+
+use App\Models\TypeVehicule;
+
 $title = "Flux de Trafic";
 
-$categories = [
-  ['type' => "motorcycle", 'name' => "Moto", 'class' => "Classe 1", 'price' => "500", 'validity' => "01/24"],
-  ['type' => "directions_car", 'name' => "Voiture", 'class' => "Classe 2", 'price' => "1 500", 'validity' => "01/24"],
-  ['type' => "airport_shuttle", 'name' => "Van/SUV", 'class' => "Classe 3", 'price' => '3 000', 'validity' => "01/24"],
-  ['type' => "local_shipping", 'name' => "Poids Lourd", 'class' => "Classe 4", 'price' => "10K", 'validity' => "01/24"],
-];
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
+/** @var PDO */
+$pdo = $pdo;
+
+$query = $pdo->prepare("SELECT * FROM typevehicule ORDER BY price");
+$query->setFetchMode(PDO::FETCH_CLASS, TypeVehicule::class);
+$query->execute();
+
+$types = $query->fetchAll();
+
+// dd($types);
 ?>
 
 <main class="md:ml-72 pt-20 px-8 pb-12 relative">
@@ -35,32 +43,31 @@ $categories = [
     </div>
 
     <!-- Vehicle Categories Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-20">
-      <?php foreach ($categories as $category) : ?>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-20">
+      <?php foreach ($types as $type) : ?>
         <div class="bg-surface-container-lowest p-8 rounded-xl ghost-border hover:shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
           <span class="material-symbols-outlined text-[64px] text-primary mb-8 block transition-transform group-hover:scale-110">
-            <?= $category['type'] ?>
+            <?= $type->getIcon() ?>
           </span>
-          <h3 class="font-headline font-bold text-lg mb-1"><?= $category['name'] ?></h3>
+          <h3 class="font-headline font-bold text-lg mb-1"><?= $type->libelle ?></h3>
           <p class="text-on-surface-variant text-xs mb-6 uppercase tracking-widest">
-            <?= $category['class'] ?>
+            classe <?= $type->id ?>
           </p>
           <div class="flex items-baseline gap-1 mb-6">
             <span class="font-mono text-2xl font-bold text-secondary">
-              <?= $category['price'] ?>
+              <?= $type->getPrice() ?>
             </span>
             <small class="text-secondary font-bold text-sm">FCFA</small>
           </div>
           <div class="bg-surface-container-low inline-flex items-center gap-2 px-3 py-1 rounded-full">
             <span class="w-1.5 h-1.5 bg-secondary diamond-indicator"></span>
             <span class="text-[10px] font-mono font-bold text-on-surface-variant">
-              Valide depuis <?= $category['validity'] ?>
+              Valide depuis <?= $type->getCreatedAt()->format('d/m/Y') ?>
             </span>
           </div>
         </div>
       <?php endforeach ?>
-      <!-- Spécial -->
       <div
         class="bg-surface-container-lowest p-8 rounded-xl ghost-border hover:shadow-xl hover:shadow-primary/5 transition-all group relative overflow-hidden border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-center">
         <span class="material-symbols-outlined text-[48px] text-outline-variant mb-4"

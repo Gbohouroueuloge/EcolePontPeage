@@ -1,4 +1,7 @@
 <?php
+
+use App\Models\Paiement;
+
 $title = "Dashboard";
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
@@ -17,7 +20,17 @@ $query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id
 $query->execute([]);
 $agentsCours = $query->fetchAll();
 
-// dd($agentsCours);
+$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 8");
+$query->execute([]);
+/** @var Paiement[] */
+$payments = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+
+$revenue = 0;
+foreach ($payments as $payment) {
+  $revenue += $payment->montant;
+}
+
+// dd($payments);
 
 ?>
 
@@ -48,10 +61,8 @@ $agentsCours = $query->fetchAll();
           payments
         </span>
       </div>
-      <div class="font-mono text-[40px] font-bold text-secondary leading-none mb-2">9 367 055 FCFA</div>
-      <div class="flex items-center gap-2 text-green-600 font-headline font-bold text-sm">
-        <span class="material-symbols-outlined text-sm">trending_up</span>
-        +12.4% vs hier
+      <div class="font-mono text-[40px] font-bold text-secondary leading-none mb-2">
+        <?= number_format($revenue, 0, ',', ' ') ?> FCFA
       </div>
 
       <!-- Sparkline Placeholder -->
@@ -73,7 +84,7 @@ $agentsCours = $query->fetchAll();
         <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Passages</span>
         <span class="material-symbols-outlined text-primary">directions_car</span>
       </div>
-      <div class="font-mono text-4xl font-bold text-primary mb-6">4 892</div>
+      <div class="font-mono text-4xl font-bold text-primary mb-6"><?= count($payments) ?></div>
       <div class="flex flex-wrap gap-2">
         <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">Vl: 3.2k</span>
         <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">Pl: 1.1k</span>
@@ -266,23 +277,8 @@ $agentsCours = $query->fetchAll();
       </div>
 
       <div class="space-y-6 relative before:content-[''] before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
-        <?php foreach ($notifications as $notification): ?>
-          <div class="relative pl-10 flex flex-col gap-1">
-            <div
-              class="absolute left-0 top-1 w-6 h-6 rounded-full <?= $notification['color'][0] ?> flex items-center justify-center z-10 shadow-sm">
-              <span
-                class="material-symbols-outlined text-[14px] text-<?= $notification['color'][1] ?>"
-                style="font-variation-settings: 'FILL' 1;">
-                <?= $notification['type'] ?>
-              </span>
-            </div>
-            <p class="text-sm font-headline font-bold <?= $notification['color'][1] ?>">
-              <?= $notification['title'] ?>
-            </p>
-            <p class="text-xs text-on-surface-variant font-mono">
-              <?= $notification['text'] ?>
-            </p>
-          </div>
+        <?php foreach ($payments as $payment): ?>
+          <?php require 'cardActivity.php'; ?>
         <?php endforeach; ?>
       </div>
 

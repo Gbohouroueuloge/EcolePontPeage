@@ -9,11 +9,11 @@ $navLinks = [
   ['text' => "Historiques", 'icon' => 'history', 'link' => "/$url/historiques", 'isTitle' => false],
   ['text' => "Gestion", 'isTitle' => true],
   ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => "/$url/flux-trafic", 'isTitle' => false],
-  ['text' => "Abonnés", 'icon' => 'group', 'link' => "/$url/abonnes", 'isTitle' => false],
+  // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/$url/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
   ['text' => "Operators", 'icon' => 'engineering', 'link' => "/$url/operateurs", 'isTitle' => false],
   // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/$url/rapports", 'isTitle' => false],
-  ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/$url/parametres", 'isTitle' => false],
+  // ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/$url/parametres", 'isTitle' => false],
 ];
 
 ?>
@@ -97,7 +97,7 @@ $navLinks = [
             </span>
           </div>
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span> 
         </a>
       </div>
     </div>

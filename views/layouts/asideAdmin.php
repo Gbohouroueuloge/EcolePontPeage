@@ -1,3 +1,20 @@
+<?php
+
+use App\Auth;
+
+/** @var Auth */
+$auth = $auth;
+
+if (isset($_GET['logout'])) {
+  $auth->logout();
+  
+  http_response_code(301);
+  header('Location: /');
+  exit;
+}
+
+?>
+
 <div class="p-8 py-4 flex items-center gap-3">
   <div class="w-8 h-8 bg-secondary-container rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(254,190,73,0.4)]">
     <span class="material-symbols-outlined text-primary -rotate-45 text-sm">link</span>
@@ -41,9 +58,11 @@
     </div>
   </div>
   <div class="mt-4 pt-4 border-t border-white/10">
-    <div class="flex items-center gap-2 text-[10px] text-secondary-container font-bold">
-      <span class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse"></span>
-      System Health: Optimal
-    </div>
+    <a
+      href="?logout"
+      class="flex items-center gap-2 border-2 border-error/60 hover:border-error hover:bg-white/5 px-2 py-2 rounded-lg">
+      <span class="material-symbols-outlined text-error">logout</span>
+      <span class="text-error font-bold text-lg">Deconnexion</span>
+    </a>
   </div>
 </div>

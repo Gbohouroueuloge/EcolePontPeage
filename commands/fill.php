@@ -65,3 +65,22 @@ for ($i = 0; $i < 25; $i++) {
     'color'  => $color
   ]);
 }
+
+$stmt = $pdo->prepare("INSERT INTO paiement (vehicule_id, guichet_id, mode_paiement, montant) 
+            VALUES (:vehicule_id, :guichet_id, :mode_paiement, :montant)");
+
+$typeMode = ['Espece', 'Mobile Money', 'Carte', 'Abonnement'];
+
+for ($i = 0; $i < 35; $i++) {
+  $vehicule = (int)rand(1, 25);
+  $guichet = (int)rand(1, 8);
+  $mode = $typeMode[rand(0, 3)];
+  $montant = (float)rand(500, 5500);
+
+  $stmt->execute([
+    'vehicule_id'    => $vehicule,
+    'guichet_id'     => $guichet,
+    'mode_paiement'  => $mode,
+    'montant'        => $montant
+  ]);
+}

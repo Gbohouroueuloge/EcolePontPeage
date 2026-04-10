@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Guichet;
+use App\Models\Paiement;
 
 $title = "Historiques";
 
@@ -17,7 +18,19 @@ $query = $pdo->prepare("SELECT * FROM typevehicule ORDER BY created_at DESC");
 $query->execute();
 $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
 
-// dd($typevehicules);
+$query = $pdo->prepare("SELECT v.id AS vehicule_id, v.*, p.*, g.id AS guichet_id, g.emplacement, t.id AS type_vehicule_id, t.libelle 
+  FROM paiement p 
+  JOIN guichet g ON p.guichet_id = g.id 
+  JOIN vehicule v ON p.vehicule_id = v.id 
+  JOIN typevehicule t ON v.type_vehicule_id = t.id 
+  ORDER BY p.created_at DESC 
+  LIMIT 8");
+
+$query->execute([]);
+/** @var Paiement[] */
+$passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+
+// dd($passages);
 ?>
 
 
@@ -70,8 +83,7 @@ $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
             class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Voie</label>
           <select
             class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="voie"
-          >
+            name="voie">
             <option value="">Toutes les voies</option>
             <?php foreach ($guichets as $guichet) : ?>
               <option value="<?= $guichet->id ?>">Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?></option>
@@ -84,8 +96,7 @@ $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
             class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Catégorie</label>
           <select
             class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="type"
-          >
+            name="type">
             <option value="">Toutes les classes</option>
             <?php foreach ($typevehicules as $type) : ?>
               <option value="<?= $type->id ?>">Cat <?= $type->id ?> - <?= $type->libelle ?></option>
@@ -98,8 +109,7 @@ $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
             Paiement</label>
           <select
             class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="paiement"
-          >
+            name="paiement">
             <option value="">Tous les paiements</option>
             <option value="abonnement">Abonnement</option>
             <option value="carte">Carte Bancaire</option>
@@ -117,192 +127,32 @@ $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
     <!-- Data Table Section -->
     <div class="flex-1 pb-12">
       <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full hidden xl:table text-left border-collapse">
           <thead>
             <tr
               class="bg-surface-container-low text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">
               <th class="px-6 py-5">Details</th>
               <th class="px-6 py-5">Classe Véhicule</th>
               <th class="px-6 py-5">Voie</th>
-              <th class="px-6 py-5 text-right">Frais</th>
+              <th class="px-6 py-5 text-right">Frais (FCFA)</th>
               <th class="px-6 py-5">Paiement</th>
               <th class="px-6 py-5">Statut</th>
               <th class="px-6 py-5 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-surface-container">
-            <!-- Row 1 -->
-            <tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
-              <td class="px-6 py-4">
-                <div class="flex flex-col items-center">
-                  <div
-                    class="bg-surface-container-highest px-3 py-1 rounded inline-block license-plate-border">
-                    <span
-                      class="font-mono text-primary font-bold tracking-tighter text-lg">GX-902-LK</span>
-                  </div>
-                  <div>
-                    <div class="text-sm font-mono text-primary">14:22:05</div>
-                    <div class="text-[10px] text-slate-400 font-bold">24 OCT 2023</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400">directions_car</span>
-                  <span class="text-sm font-medium text-on-surface">Classe 1</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="text-xs font-bold text-slate-500 px-2 py-1 bg-surface rounded">VOIE_03_S</span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span class="font-mono font-bold text-emerald-600">3 000 FCFA</span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-secondary text-sm"
-                    style="font-variation-settings: 'FILL' 1;">contactless</span>
-                  <span class="text-xs font-medium">TAG_612</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div
-                  class="flex items-center gap-2 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full w-fit">
-                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                  <span class="text-[10px] font-black uppercase">Confirmé</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span
-                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-              </td>
-            </tr>
-            <!-- Row 2 -->
-            <tr
-              class="group hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest">
-              <td class="px-6 py-4">
-                <div
-                  class="bg-surface-container-highest px-3 py-1 rounded inline-block license-plate-border">
-                  <span
-                    class="font-mono text-primary font-bold tracking-tighter text-lg">BT-442-XM</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400">local_shipping</span>
-                  <span class="text-sm font-medium text-on-surface">Classe 4</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="text-xs font-bold text-slate-500 px-2 py-1 bg-surface rounded">VOIE_01_N</span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span class="font-mono font-bold text-emerald-600">8 500 FCFA</span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-slate-400 text-sm">credit_card</span>
-                  <span class="text-xs font-medium">VISA_4201</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div
-                  class="flex items-center gap-2 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full w-fit">
-                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                  <span class="text-[10px] font-black uppercase">Confirmé</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span
-                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-              </td>
-            </tr>
-            <!-- Row 3 (Alert) -->
-            <tr
-              class="group hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest">
-              <td class="px-6 py-4">
-                <div
-                  class="bg-surface-container-highest px-3 py-1 rounded inline-block license-plate-border border-error">
-                  <span
-                    class="font-mono text-primary font-bold tracking-tighter text-lg">??-SCAN-01</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-error">question_mark</span>
-                  <span class="text-sm font-medium text-on-surface">Inconnu</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="text-xs font-bold text-slate-500 px-2 py-1 bg-surface rounded">VOIE_02_N</span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span class="font-mono font-bold text-error">0 FCFA</span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-error text-sm">warning</span>
-                  <span class="text-xs font-medium text-error">ÉCHEC</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div
-                  class="flex items-center gap-2 px-2 py-1 bg-error-container text-on-error-container rounded-full w-fit">
-                  <span class="w-1.5 h-1.5 bg-error rounded-full"></span>
-                  <span class="text-[10px] font-black uppercase">Révision</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span
-                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-              </td>
-            </tr>
-            <!-- More Rows -->
-            <tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
-              <td class="px-6 py-4">
-                <div
-                  class="bg-surface-container-highest px-3 py-1 rounded inline-block license-plate-border">
-                  <span
-                    class="font-mono text-primary font-bold tracking-tighter text-lg">AZ-555-ZZ</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400">two_wheeler</span>
-                  <span class="text-sm font-medium text-on-surface">Classe 0</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="text-xs font-bold text-slate-500 px-2 py-1 bg-surface rounded">VOIE_03_S</span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span class="font-mono font-bold text-emerald-600">1 500 FCFA</span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-secondary text-sm"
-                    style="font-variation-settings: 'FILL' 1;">contactless</span>
-                  <span class="text-xs font-medium">TAG_991</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div
-                  class="flex items-center gap-2 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full w-fit">
-                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                  <span class="text-[10px] font-black uppercase">Confirmé</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span
-                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-              </td>
-            </tr>
+            <?php foreach ($passages as $passage) : ?>
+              <?php require 'cardRowPassage.php' ?>
+            <?php endforeach; ?>
           </tbody>
         </table>
+
+        <div class="w-full flex xl:hidden flex-col gap-4">
+          <?php foreach ($passages as $passage) : ?>
+            <?php require 'cardRowPassageMobile.php' ?>
+          <?php endforeach; ?>
+        </div>
+
         <div class="bg-surface-container-low px-8 py-4 flex justify-between items-center">
           <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Affichage de 24 sur 1
             209 résultats</div>
@@ -408,7 +258,7 @@ $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
       </div>
     </div>
 
-    <div 
+    <div
       class="p-8 border-t border-surface-container-low bg-surface-container-lowest">
       <div
         class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">

@@ -91,3 +91,27 @@ CREATE TABLE Agent_Guichet (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 )
+
+
+CREATE TABLE Paiement (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    vehicule_id INT UNSIGNED NOT NULL,
+    guichet_id INT UNSIGNED NOT NULL,
+    mode_paiement VARCHAR(50) NOT NULL,
+    montant DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+
+    CONSTRAINT fk_paiement_vehicule
+        FOREIGN KEY (vehicule_id)
+        REFERENCES Vehicule(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_paiement_guichet
+        FOREIGN KEY (guichet_id)
+        REFERENCES Guichet(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+)

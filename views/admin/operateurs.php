@@ -1,5 +1,27 @@
 <?php
+
+use App\Models\Agent;
+
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
+
 $title = "Operators";
+
+/** @var PDO */
+$pdo = $pdo;
+
+$query = $pdo->prepare("SELECT a.id AS agent_real_id, a.*, u.username, g.id AS guichet_real_id, g.emplacement FROM agent a JOIN users u ON a.user_id = u.id JOIN agent_guichet ag ON a.id = ag.agent_id JOIN guichet g ON ag.guichet_id = g.id");
+
+$query->execute();
+$agents = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+
+$agentsActive = [];
+foreach ($agents as $agent) {
+  if ($agent->is_en_cours()) {
+    $agentsActive[] = $agent;
+  }
+}
+
+// dd($agents);
 
 ?>
 
@@ -26,11 +48,11 @@ $title = "Operators";
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-primary">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total Staff</div>
-        <div class="font-mono text-3xl font-bold text-primary">124</div>
+        <div class="font-mono text-3xl font-bold text-primary"><?= count($agents) ?></div>
       </div>
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-secondary-container">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Postes Actifs</div>
-        <div class="font-mono text-3xl font-bold text-primary">32</div>
+        <div class="font-mono text-3xl font-bold text-primary"><?= count($agentsActive) ?></div>
       </div>
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-emerald-500">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Taux d'Efficacité</div>
@@ -63,114 +85,56 @@ $title = "Operators";
           </tr>
         </thead>
         <tbody class="divide-y divide-surface-container-low">
-          <!-- Row 1 -->
-          <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-md overflow-hidden bg-slate-100 border border-surface-variant">
-                  <img alt="Agent Jean-Pierre" class="w-full h-full object-cover"
-                    data-alt="portrait of a focused professional security agent in a neat uniform"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1kwItSqblapgvVQI40kig6Mr7lZaV-FcPYShSMgZgCuzu5tkGQfmZxnlMeOdZTykiWXnt4KQI9SCfLv9bHhMQyqsCbn1U319WsGDxzkukyTJMizRrEwlvmz0OrUk3nADTD7uQqoT-i-oMsYQV9-sVr7ZafMhdcs-iLu-nqCY8hcqXx-6Y6t38DRZtjI6pkEt6CMEfQShhzQeLponcKJpD5eQRwWYewC5MqTanvRRhGZ9n2KDO_AZP99x4K705EXiGJowtPGMu8HJ2" />
+          <?php foreach ($agents as $agent) : ?>
+            <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-4">
+                  <div
+                    class="inline-flex items-center justify-center border-2 border-surface-container-high  overflow-hidden h-10 w-10 rounded-full ring-2 bg-surface-container-high ring-white group">
+                    <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
+                      <?= substr($agent->username, 0, 2) ?>
+                    </span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-primary text-sm uppercase"><?= $agent->username ?></div>
+                    <div class="font-mono text-[10px] text-slate-400">ID-PRT-<?= $agent->id ?></div>
+                  </div>
                 </div>
-                <div>
-                  <div class="font-bold text-primary text-sm uppercase">Jean-Pierre Dubois</div>
-                  <div class="font-mono text-[10px] text-slate-400">ID-PRT-22940</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 diamond-indicator bg-emerald-500 animate-pulse"></div>
-                <span class="text-[11px] font-bold text-emerald-700 uppercase">En Service</span>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span
-                class="bg-primary-container text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">LANE_04_NORTH</span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span class="font-mono text-sm font-bold text-primary">12,450</span>
-            </td>
-            <td class="px-6 py-4 text-xs text-slate-500">
-              Aujourd'hui, 06:00
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span
-                class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-            </td>
-          </tr>
-          <!-- Row 2 -->
-          <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-md overflow-hidden bg-slate-100 border border-surface-variant">
-                  <img alt="Agent Sarah K." class="w-full h-full object-cover"
-                    data-alt="portrait of a professional female officer in bridge operations gear"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKuNv3cLQF-PiPZNjL2AkeDHD-W1Qk3EqxkezE9KdEcp-f6E8T7_0_oG9mbO82qhxA83BHfb9Fr_wq0TjuO9GJHZcsAvBqPvp8cW7S_v1u8dUyDA4y8upZkCeZhO1qj0NEx9MQ7doF4pRfB3VxL-VsKPr3Udm5orc7uwdhuWkvjEX2LimqJJa4HjeNInpir21Uclm_1pMUY-sgBR3RHOc6uiTHz09sQkNxoqFJYSv3pc-27vK_3tVQEiURGuRiu-c1OX9pe9NjWuRs" />
-                </div>
-                <div>
-                  <div class="font-bold text-primary text-sm uppercase">Sarah Kerkouane</div>
-                  <div class="font-mono text-[10px] text-slate-400">ID-PRT-23112</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 diamond-indicator bg-slate-300"></div>
-                <span class="text-[11px] font-bold text-slate-500 uppercase">Repos</span>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span
-                class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span class="font-mono text-sm font-bold text-primary">11,892</span>
-            </td>
-            <td class="px-6 py-4 text-xs text-slate-500">
-              Hier, 22:00
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span
-                class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-            </td>
-          </tr>
-          <!-- Row 3 -->
-          <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-md overflow-hidden bg-slate-100 border border-surface-variant">
-                  <img alt="Agent Marc T." class="w-full h-full object-cover"
-                    data-alt="middle-aged male staff member in logistics uniform smiling professionally"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4Z08acE9a37acjFfi_6dGuOxNFuzEU0styaAGVa5NrpUtxjzlXluZh1vbm5F91uiNi-JuxZMbJeYJDyZFSyPx4LK7KYQBHEChmaSIN4TIr8Bj-M9nREPos4uavdd3qhb2F-NIYXVmSAU94DIVt6a68bQLw-ybJlU5Wtl0B1EetKj40812nQUxpA0KmEVPpccaluSIZbXOSMt5NkMbGQFlcPzc9Ja9wGb0jAl4ZKmEZPbjQVC3njM_0wtNkbgpEYx-zE8TwR99YG8p" />
-                </div>
-                <div>
-                  <div class="font-bold text-primary text-sm uppercase">Marc Toussaint</div>
-                  <div class="font-mono text-[10px] text-slate-400">ID-PRT-22005</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 diamond-indicator bg-emerald-500 animate-pulse"></div>
-                <span class="text-[11px] font-bold text-emerald-700 uppercase">En Service</span>
-              </div>
-            </td>
-            <td class="px-6 py-4">
-              <span
-                class="bg-primary-container text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">LANE_01_SOUTH</span>
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span class="font-mono text-sm font-bold text-primary">14,105</span>
-            </td>
-            <td class="px-6 py-4 text-xs text-slate-500">
-              Aujourd'hui, 08:00
-            </td>
-            <td class="px-6 py-4 text-right">
-              <span
-                class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
-            </td>
-          </tr>
+              </td>
+              <td class="px-6 py-4">
+                <?php if ($agent->is_en_cours()) : ?>
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 diamond-indicator bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[11px] font-bold text-emerald-700 uppercase">En Service</span>
+                  </div>
+                <?php else : ?>
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 diamond-indicator bg-slate-300"></div>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Repos</span>
+                  </div>
+                <?php endif ?>
+              </td>
+              <td class="px-6 py-4">
+                <?php if ($agent->is_en_cours()) : ?>
+                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
+                    VOIE_<?= $agent->guichet_real_id ?>_<?= $agent->emplacement ?>
+                  </span>
+                  <?php else : ?>
+                    <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
+                  <?php endif ?>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <span class="font-mono text-sm font-bold text-primary">0</span>
+              </td>
+              <td class="px-6 py-4 text-xs text-slate-500">
+                <?= $agent->getDateDebut()->format('d/m/Y H:i') ?>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <span
+                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+              </td>
+            </tr>
+          <?php endforeach ?>
         </tbody>
       </table>
       <div class="px-6 py-4 bg-surface-container-low/30 flex justify-between items-center">
