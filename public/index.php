@@ -14,29 +14,31 @@ $router = new App\Router(dirname(__DIR__) . '/views');
 $router
   ->get('/', 'home/index', 'home.index')
   ->get('/login', 'home/login', 'home.login')
-  ->post('/login', 'home/login', 'home.login.post') // même vue, nom différent
+  ->post('/login', 'home/login', 'home.login.post')
   ->get('/register', 'home/register', 'home.register')
+  ->post('/register', 'home/register', 'home.register.post')
   ->run();
 
 $routerAdmin = new App\Router(dirname(__DIR__) . '/views');
 
 $routerAdmin
-  ->get('/admin/[*:username]-[i:id]', 'admin/index', 'admin.index')
-  ->get('/admin/[*:username]-[i:id]/flux-trafic', 'admin/trafic', 'admin.trafic')
-  ->get('/admin/[*:username]-[i:id]/abonnes', 'admin/abonnes', 'admin.abonnes')
-  ->get('/admin/[*:username]-[i:id]/historiques', 'admin/historiques', 'admin.historiques')
-  ->get('/admin/[*:username]-[i:id]/operateurs', 'admin/operateurs', 'admin.operateurs')
-  ->get('/admin/[*:username]-[i:id]/rapports', 'admin/rapports', 'admin.rapports')
-  ->get('/admin/[*:username]-[i:id]/parametres', 'admin/parametres', 'admin.parametres')
+  ->get('/admin', 'admin/index', 'admin.index')
+  ->get('/admin/flux-trafic', 'admin/trafic', 'admin.trafic')
+  ->get('/admin/abonnes', 'admin/abonnes', 'admin.abonnes')
+  ->get('/admin/historiques', 'admin/historiques', 'admin.historiques')
+  ->get('/admin/operateurs', 'admin/operateurs', 'admin.operateurs')
+  ->get('/admin/operateurs/[*:operateur_username]-[i:operateur_id]', 'admin/operateurs', 'admin.operateurs.details')
+  ->get('/admin/rapports', 'admin/rapports', 'admin.rapports')
+  ->get('/admin/parametres', 'admin/parametres', 'admin.parametres')
   ->run('adminLayout');
 
 $routerOperator = new App\Router(dirname(__DIR__) . '/views');
 
 $routerOperator
-  ->get('/operator/[*:username]-[i:id]', 'operator/index', 'operator.index')
-  ->get('/operator/[*:username]-[i:id]/caisse', 'operator/caisse', 'operator.caisse')
-  ->get('/operator/[*:username]-[i:id]/incident', 'operator/incident', 'operator.incident')
-  ->get('/operator/[*:username]-[i:id]/mon-shift', 'operator/shift', 'operator.shift')
+  ->get('/operator', 'operator/index', 'operator.index')
+  ->get('/operator/caisse', 'operator/caisse', 'operator.caisse')
+  ->get('/operator/incident', 'operator/incident', 'operator.incident')
+  ->get('/operator/mon-shift', 'operator/shift', 'operator.shift')
   ->run('operatorLayout');
 
 http_response_code(404);

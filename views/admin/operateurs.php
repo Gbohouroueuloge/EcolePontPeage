@@ -1,27 +1,67 @@
 <?php
 
 use App\Models\Agent;
+use App\Models\Guichet;
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
 $title = "Operators";
 
+$isOpen = false;
+
 /** @var PDO */
 $pdo = $pdo;
 
-$query = $pdo->prepare("SELECT a.id AS agent_real_id, a.*, u.username, g.id AS guichet_real_id, g.emplacement FROM agent a JOIN users u ON a.user_id = u.id JOIN agent_guichet ag ON a.id = ag.agent_id JOIN guichet g ON ag.guichet_id = g.id");
+if (isset($_GET['voie'])) {
+  $agentId = $params['operateur_id'];
+  $voie    = (int) $_GET['voie'];
 
-$query->execute();
-$agents = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+  $delete = $pdo->prepare("DELETE FROM agent_guichet WHERE agent_id = ?");
+  $delete->execute([$agentId]);
 
-$agentsActive = [];
-foreach ($agents as $agent) {
-  if ($agent->is_en_cours()) {
-    $agentsActive[] = $agent;
-  }
+  $insert = $pdo->prepare("INSERT INTO agent_guichet (agent_id, guichet_id) VALUES (?, ?)");
+  $insert->execute([$agentId, $voie]);
+
+  header("Location: /admin/operateurs");
+  exit;
 }
 
-// dd($agents);
+if (isset($_GET['delete'])) {
+  $agentId = $params['operateur_id'];
+
+  $delete = $pdo->prepare("DELETE FROM agent_guichet WHERE agent_id = ?");
+  $delete->execute([$agentId]);
+
+  header("Location: /admin/operateurs");
+  exit;
+}
+
+$query = $pdo->prepare("SELECT COUNT(id) FROM paiement");
+$query->execute([]);
+$Nbrpayment = $query->fetchColumn();
+
+$query = $pdo->prepare("
+    SELECT 
+        a.id AS agent_real_id, 
+        a.*, 
+        u.username, 
+        g.id AS guichet_real_id, 
+        g.emplacement 
+    FROM agent a 
+    JOIN users u ON a.user_id = u.id 
+    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
+    LEFT JOIN guichet g ON ag.guichet_id = g.id
+");
+
+$query->execute();
+$agentsAll = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+
+$agentsActive = array_filter($agentsAll, fn($a) => $a->is_en_cours());
+
+$query = $pdo->prepare("SELECT * FROM guichet ORDER BY created_at ASC");
+$query->execute();
+/** @var Guichet[] */
+$guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
 
 ?>
 
@@ -48,7 +88,7 @@ foreach ($agents as $agent) {
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-primary">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total Staff</div>
-        <div class="font-mono text-3xl font-bold text-primary"><?= count($agents) ?></div>
+        <div class="font-mono text-3xl font-bold text-primary"><?= count($agentsAll) ?></div>
       </div>
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-secondary-container">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Postes Actifs</div>
@@ -59,8 +99,10 @@ foreach ($agents as $agent) {
         <div class="font-mono text-3xl font-bold text-primary">98.2<span class="text-sm font-body">%</span></div>
       </div>
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-on-tertiary-container">
-        <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Passages/Heure</div>
-        <div class="font-mono text-3xl font-bold text-primary">4,102</div>
+        <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Passages</div>
+        <div class="font-mono text-3xl font-bold text-primary">
+          <?= $Nbrpayment ?>
+        </div>
       </div>
     </div>
 
@@ -80,12 +122,14 @@ foreach ($agents as $agent) {
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Voie Assignée</th>
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Passages
               Mensuels</th>
-            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Dernière Garde</th>
-            <th class="px-6 py-4"></th>
+            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              Dernière Garde
+            </th>
+            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-surface-container-low">
-          <?php foreach ($agents as $agent) : ?>
+          <?php foreach ($agentsAll as $agent) : ?>
             <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -119,19 +163,45 @@ foreach ($agents as $agent) {
                   <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
                     VOIE_<?= $agent->guichet_real_id ?>_<?= $agent->emplacement ?>
                   </span>
-                  <?php else : ?>
-                    <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
-                  <?php endif ?>
+                <?php else : ?>
+                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
+                <?php endif ?>
               </td>
               <td class="px-6 py-4 text-right">
                 <span class="font-mono text-sm font-bold text-primary">0</span>
               </td>
               <td class="px-6 py-4 text-xs text-slate-500">
-                <?= $agent->getDateDebut()->format('d/m/Y H:i') ?>
+                <?php if ($agent->getDateDebut()) : ?>
+                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
+                    <?= $agent->getDateDebut()->format('d/m/Y H:i') ?>
+                  </span>
+                <?php else : ?>
+                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
+                <?php endif ?>
               </td>
               <td class="px-6 py-4 text-right">
-                <span
-                  class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+                <div class="flex items-center gap-2">
+                  <select
+                    name="voie"
+                    onchange="window.location.href = '/admin/operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?voie=' + this.value"
+                    id="voie"
+                    class="w-full text-xs bg-white rounded-lg border border-surface-variant px-2 py-1 text-primary font-semibold shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer">
+                    <option value="" disabled <?= $agent->guichet_real_id === null ? 'selected' : '' ?>>Choisir une voie...</option>
+                    <?php foreach ($guichets as $guichet) : ?>
+                      <option value="<?= $guichet->id ?>" <?= $agent->guichet_real_id == $guichet->id ? 'selected' : '' ?>>
+                        Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?>
+                      </option>
+                    <?php endforeach ?>
+                  </select>
+
+                  <?php if ($agent->guichet_real_id !== null) : ?>
+                    <a
+                      href="operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?delete"
+                      class="p-0.5 bg-error-container text-error rounded border border-surface-variant hover:bg-error/35 cursor-pointer">
+                      <span class="material-symbols-outlined text-xs">delete</span>
+                    </a>
+                  <?php endif ?>
+                </div>
               </td>
             </tr>
           <?php endforeach ?>
@@ -153,7 +223,7 @@ foreach ($agents as $agent) {
 
   <!-- Slide-in Side Panel (Agent Details) -->
   <div
-    class="fixed hidden right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
+    class="fixed <?= $isOpen ? 'flex' : 'hidden' ?> right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
     <!-- Panel Header -->
     <div class="px-8 py-10 border-b border-surface-container-low relative">
       <button class="absolute top-8 right-8 text-slate-400 hover:text-primary">

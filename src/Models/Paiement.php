@@ -11,10 +11,10 @@ class Paiement {
   public $updated_at;
 
   private $icon = [
-    "Espece" => "attach_money",
+    "Espece" => "payments",
     "Mobile Money" => "phone_android",
     "Carte" => "credit_card",
-    "Abonnement" => "subscriptions",
+    "Abonnement" => "contactless",
   ];
 
   public function getIcon(): string {

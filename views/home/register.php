@@ -1,3 +1,31 @@
+<?php
+
+use App\Auth;
+use App\ConnectionBDD;
+use App\Components\Notification;
+
+$auth = new Auth(ConnectionBDD::getPdo());
+
+$error = null;
+
+if (!empty($_POST)) {
+  if ($_POST['password'] !== $_POST['confirm_password']) {
+    $error = 'Les mots de passe ne correspondent pas.';
+    exit();
+  }
+
+  $registered = $auth->register($_POST);
+
+  if ($registered) {
+    header('Location: /');
+    exit();
+  } else {
+    $error = 'Adresse e-mail deja utilisé ou les mots de passe ne correspondent pas.';
+  }
+}
+
+?>
+
 <main class="flex min-h-screen">
   <!-- Left Section: Visual Narrative (Deep Navy) -->
   <section class="hidden md:flex w-1/2 bg-primary-container relative flex-col justify-end p-20 overflow-hidden">
@@ -61,64 +89,56 @@
         </p>
       </header>
 
+      <?php if ($error) : ?>
+        <?= Notification::display($error, 'error'); ?>
+      <?php endif; ?>
+
       <!-- Registration Form -->
-      <form class="space-y-6">
+      <form class="space-y-6" action="" method="post">
         <div class="space-y-1.5">
-          <label
-            class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold px-1">Nom
-            Complet</label>
+          <label class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold px-1">
+            Nom Complet
+          </label>
           <input
             class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/15 rounded-lg px-4 py-3.5 focus:ring-2 focus:ring-secondary-container transition-all placeholder:text-on-surface/20 text-on-surface font-body outline-none"
-            placeholder="Jean-Pierre Architecte" type="text" />
+            placeholder="Votre Nom Complet" type="text" name="username" required
+            value="<?= $_POST['username'] ?? '' ?>" />
         </div>
         <div class="space-y-1.5">
-          <label
-            class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold px-1">Email
-            Professionnel</label>
+          <label class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold px-1">
+            Email Professionnel
+          </label>
           <input
             class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/15 rounded-lg px-4 py-3.5 focus:ring-2 focus:ring-secondary-container transition-all placeholder:text-on-surface/20 text-on-surface font-body outline-none"
-            placeholder="jp.architecte@pontis.com" type="email" />
+            placeholder="Votre Email Professionnel" type="email" name="email" required
+            value="<?= $_POST['email'] ?? '' ?>" />
         </div>
 
         <div class="space-y-1.5">
           <div class="flex justify-between items-center px-1">
-            <label
-              class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold">Mot
-              de Passe</label>
+            <label class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold">
+              Mot de Passe
+            </label>
             <span class="text-[9px] font-mono uppercase tracking-tighter text-secondary">Sécurisé</span>
           </div>
 
           <div class="relative">
             <input
               class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/15 rounded-lg px-4 py-3.5 focus:ring-2 focus:ring-secondary-container transition-all placeholder:text-on-surface/20 text-on-surface font-body outline-none"
-              placeholder="••••••••••••"
-              type="password" />
-
-            <button
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
-              type="button">
-              <span class="material-symbols-outlined text-[20px]">visibility</span>
-            </button>
-          </div>
-
-          <!-- Password Strength Bar -->
-          <div class="flex gap-1 h-1 mt-2">
-            <div class="flex-1 bg-secondary rounded-full"></div>
-            <div class="flex-1 bg-secondary rounded-full"></div>
-            <div class="flex-1 bg-secondary rounded-full"></div>
-            <div class="flex-1 bg-surface-container-high rounded-full"></div>
+              placeholder="Votre Mot de Passe" type="password" name="password" required />
           </div>
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold" for="confirm-password">Confimer Mot de
-              passe</label>
+            <label class="font-label text-[10px] uppercase tracking-widest text-on-surface/60 font-semibold" for="confirm-confirm_password">
+              Confimer Mot de passe
+            </label>
           </div>
 
           <input
             class="w-full px-4 py-3 bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-secondary-container rounded-lg font-body transition-all duration-200 outline-none"
-            id="confirm-password" name="confirm-password" placeholder="confirmer le mot de passe" type="password" />
+            id="confirm_password" name="confirm_password" placeholder="confirmer le mot de passe" type="password" />
         </div>
 
         <button

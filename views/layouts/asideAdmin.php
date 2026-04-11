@@ -42,7 +42,7 @@ if (isset($_GET['logout'])) {
 <div class="p-6 -mb-6 bg-white/5 mt-auto">
   <div class="flex items-center gap-3">
     <a
-      href="/admin/<?= $url ?>/parametres"
+      href=""
       class="relative inline-flex group cursor-pointer">
       <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
         <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">

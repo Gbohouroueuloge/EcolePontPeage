@@ -5,6 +5,7 @@ use App\Components\Notification;
 use App\Models\User;
 use App\Models\Agent;
 use App\Models\Guichet;
+use App\Models\Paiement;
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
@@ -41,6 +42,20 @@ if (isset($_GET['logout'])) {
   exit();
 }
 
+$query = $pdo->prepare("SELECT v.id AS vehicule_id, v.immatriculation, p.*, t.id AS type_vehicule_id, t.libelle 
+  FROM paiement p 
+  JOIN vehicule v ON p.vehicule_id = v.id 
+  JOIN typevehicule t ON v.type_vehicule_id = t.id 
+  WHERE p.guichet_id = :guichet_id
+  ORDER BY p.created_at DESC 
+  LIMIT 8");
+
+$query->execute(['guichet_id' => $guichet->id]);
+/** @var Paiement[] */
+$passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+
+
+// dd($passages);
 ?>
 
 <main class="pt-24 px-4 md:px-8 mb-24 max-w-7xl mx-auto">
@@ -132,72 +147,22 @@ if (isset($_GET['logout'])) {
           <thead class="bg-surface-container-low">
             <tr>
               <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase font-headline">
-                Heure</th>
+                Date</th>
               <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase font-headline">
-                Véhicule</th>
+                immatriculation</th>
               <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase font-headline">
-                Cat.</th>
+                Catégorie</th>
               <th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase font-headline">
                 Paiement</th>
               <th
                 class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase font-headline text-right">
-                Montant</th>
+                Montant (FCFA)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-surface-container">
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="px-6 py-4 mono-data text-sm">10:42:15</td>
-              <td class="px-6 py-4">
-                <div
-                  class="inline-flex items-center px-3 py-1 rounded bg-surface-container-highest border-l-2 border-primary-container">
-                  <span class="mono-data font-bold text-sm tracking-wider">AA-123-BB</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm font-medium">C1</td>
-              <td class="px-6 py-4">
-                <span
-                  class="flex items-center gap-1 text-xs font-bold text-on-tertiary-fixed-variant">
-                  <span class="material-symbols-outlined text-sm">contactless</span>
-                  TAG
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right mono-data font-bold text-primary">500</td>
-            </tr>
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="px-6 py-4 mono-data text-sm">10:41:02</td>
-              <td class="px-6 py-4">
-                <div
-                  class="inline-flex items-center px-3 py-1 rounded bg-surface-container-highest border-l-2 border-primary-container">
-                  <span class="mono-data font-bold text-sm tracking-wider">CK-908-XZ</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm font-medium">C2</td>
-              <td class="px-6 py-4">
-                <span class="flex items-center gap-1 text-xs font-bold text-secondary">
-                  <span class="material-symbols-outlined text-sm">payments</span>
-                  CASH
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right mono-data font-bold text-primary">1,500</td>
-            </tr>
-            <tr class="hover:bg-surface-container-low transition-colors">
-              <td class="px-6 py-4 mono-data text-sm">10:38:44</td>
-              <td class="px-6 py-4">
-                <div
-                  class="inline-flex items-center px-3 py-1 rounded bg-surface-container-highest border-l-2 border-primary-container">
-                  <span class="mono-data font-bold text-sm tracking-wider">LT-442-DD</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm font-medium">C1</td>
-              <td class="px-6 py-4">
-                <span
-                  class="flex items-center gap-1 text-xs font-bold text-on-tertiary-fixed-variant">
-                  <span class="material-symbols-outlined text-sm">contactless</span>
-                  TAG
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right mono-data font-bold text-primary">500</td>
-            </tr>
+            <?php foreach ($passages as $passage) : ?>
+              <?php require 'cardRowPassage.php' ?>
+            <?php endforeach; ?>
           </tbody>
         </table>
       </div>

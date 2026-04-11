@@ -16,6 +16,13 @@ $isAdmin = $auth->isAdmin();
 
 $user = $auth->getUser();
 
+if (isset($_GET['logout'])) {
+  $auth->logout();
+
+  header('Location: /');
+  exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,29 +69,15 @@ $user = $auth->getUser();
       </nav>
 
       <?php if ($isAdmin) : ?>
-        <a
-          href="/admin/<?= $user->username . '-' . $user->id ?>"
-          class="relative inline-flex group cursor-pointer">
-          <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high bg-primary shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
-            <span class="text-on-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
-              <?= substr($user->username, 0, 2) ?>
-            </span>
-          </div>
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
-        </a>
+        <?php 
+          $type = "admin";
+          require "badgeUser.php" 
+        ?>
       <?php elseif ($isconnected): ?>
-        <a
-          href="/operator/<?= $user->username . '-' . $user->id ?>"
-          class="relative inline-flex group cursor-pointer">
-          <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
-            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
-              <?= substr($user->username, 0, 2) ?>
-            </span>
-          </div>
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
-        </a>
+        <?php 
+          $type = "operator";
+          require "badgeUser.php" 
+        ?>
       <?php else: ?>
         <div class="flex items-center gap-3">
           <a

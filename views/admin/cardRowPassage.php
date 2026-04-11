@@ -5,6 +5,13 @@ $iconVehicule = [
   "Van/SUV" => "airport_shuttle",
   "Poids Lourd" => "local_shipping",
 ];
+
+$color = [
+  "Espece" => "brand-success",
+  "Mobile Money" => "inverse-primary",
+  "Carte" => "brand-indigo",
+  "Abonnement" => "secondary-container",
+]
 ?>
 
 <tr class="group hover:bg-surface-container-low transition-colors cursor-pointer">
@@ -45,8 +52,8 @@ $iconVehicule = [
     </span>
   </td>
   <td class="px-6 py-4">
-    <div class="flex items-center gap-2">
-      <span class="material-symbols-outlined text-secondary text-sm">
+    <div class="flex items-center gap-2 text-<?= $color[$passage->mode_paiement] ?>">
+      <span class="material-symbols-outlined text-sm">
         <?= $passage->getIcon() ?>
       </span>
       <span class="text-xs font-medium"><?= $passage->mode_paiement ?></span>

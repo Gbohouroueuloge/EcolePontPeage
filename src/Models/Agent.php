@@ -10,22 +10,24 @@ class Agent extends User
 
   public function getDateDebut(): ?\DateTime
   {
-    return new \DateTime($this->debut) ?? null;
+    return $this->debut ? new \DateTime($this->debut) : null;
   }
 
   public function getDateFin(): ?\DateTime
   {
-    return new \DateTime($this->fin) ?? null;
+    return $this->fin ? new \DateTime($this->fin) : null;
   }
 
-  function is_en_cours()
+  function is_en_cours(): bool
   {
     $debut = $this->getDateDebut();
     $fin = $this->getDateFin();
 
-    if ($debut->getTimestamp() <= time() && ($fin === null || $fin->getTimestamp() >= time())) {
-      return true;
+    // Si pas de date de début définie, l'agent n'est pas en service
+    if ($debut === null) {
+      return false;
     }
-    return false;
+
+    return $debut->getTimestamp() <= time() && ($fin === null || $fin->getTimestamp() >= time());
   }
 }

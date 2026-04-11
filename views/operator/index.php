@@ -4,6 +4,7 @@ $title = 'Passage';
 use App\Models\User;
 use App\Models\Agent;
 use App\Models\Guichet;
+use App\Models\Paiement;
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
@@ -16,13 +17,25 @@ $agent = $agent;
 /** @var Guichet */
 $guichet = $guichet;
 
+$query = $pdo->prepare("SELECT v.id AS vehicule_id, v.immatriculation, p.*, t.id AS type_vehicule_id, t.libelle 
+  FROM paiement p 
+  JOIN vehicule v ON p.vehicule_id = v.id 
+  JOIN typevehicule t ON v.type_vehicule_id = t.id 
+  WHERE p.guichet_id = :guichet_id
+  ORDER BY p.created_at DESC 
+  LIMIT 10");
+
+$query->execute(['guichet_id' => $guichet->id]);
+/** @var Paiement[] */
+$passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+
 ?>
 
 <main class="pt-16 mb-24 min-h-screen flex flex-col">
   <!-- Status Bar -->
   <div class="h-16 bg-brand-success flex items-center justify-between px-8 text-white shadow-lg">
     <div class="flex items-center gap-4">
-      <?php if ($agent->is_en_cours()) : ?> 
+      <?php if ($agent->is_en_cours()) : ?>
         <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
           door_open
         </span>
@@ -152,54 +165,11 @@ $guichet = $guichet;
           <span class="material-symbols-outlined text-sm">keyboard_arrow_right</span>
         </a>
       </div>
-      <span class="font-mono text-xs text-on-surface-variant">SESSION: 04H 12M</span>
     </div>
     <div class="grid md:grid-cols-5 gap-4">
-      <!-- History Item 1 -->
-      <div
-        class="bg-surface-container-lowest p-3 rounded-lg flex items-center gap-4 border-l-4 border-brand-success shadow-sm">
-        <div class="grow">
-          <p class="font-mono font-bold text-sm text-primary">XY-991-ZZ</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase">12:44 • ESPÈCES</p>
-        </div>
-        <span class="font-mono font-bold text-brand-success">500 FCFA</span>
-      </div>
-      <!-- History Item 2 -->
-      <div
-        class="bg-surface-container-lowest p-3 rounded-lg flex items-center gap-4 border-l-4 border-secondary-container shadow-sm">
-        <div class="grow">
-          <p class="font-mono font-bold text-sm text-primary">PL-450-MK</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase">12:41 • ABON.</p>
-        </div>
-        <span class="font-mono font-bold text-secondary">00 FCFA</span>
-      </div>
-      <!-- History Item 3 -->
-      <div
-        class="bg-surface-container-lowest p-3 rounded-lg flex items-center gap-4 border-l-4 border-brand-indigo shadow-sm">
-        <div class="grow">
-          <p class="font-mono font-bold text-sm text-primary">TR-002-HH</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase">12:38 • CARTE</p>
-        </div>
-        <span class="font-mono font-bold text-brand-indigo">1500 FCFA</span>
-      </div>
-      <!-- History Item 4 -->
-      <div
-        class="bg-surface-container-lowest p-3 rounded-lg flex items-center gap-4 border-l-4 border-brand-indigo shadow-sm">
-        <div class="grow">
-          <p class="font-mono font-bold text-sm text-primary">TR-002-HH</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase">12:38 • CARTE</p>
-        </div>
-        <span class="font-mono font-bold text-brand-indigo">1500 FCFA</span>
-      </div>
-      <!-- History Item 5 -->
-      <div
-        class="bg-surface-container-lowest p-3 rounded-lg flex items-center gap-4 border-l-4 border-secondary-container shadow-sm">
-        <div class="grow">
-          <p class="font-mono font-bold text-sm text-primary">PL-450-MK</p>
-          <p class="text-[10px] text-on-surface-variant font-bold uppercase">12:41 • ABON.</p>
-        </div>
-        <span class="font-mono font-bold text-secondary">00 FCFA</span>
-      </div>
+      <?php foreach ($passages as $passage): ?>
+        <?php include 'cardsHistoryItem.php'; ?>
+      <?php endforeach; ?>
     </div>
   </footer>
 </main>

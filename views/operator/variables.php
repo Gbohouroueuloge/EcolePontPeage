@@ -12,7 +12,7 @@ $auth = new Auth($pdo);
 $user = $auth->getUser();
 
 $query = $pdo->prepare("SELECT a.id AS agent_real_id, a.*, u.username, u.email FROM agent a JOIN users u ON a.user_id = u.id WHERE u.id = :id");
-$query->execute(['id' => $params['id']]);
+$query->execute(['id' => $user->id]);
 $agent = $query->fetchObject(Agent::class);
 
 if (!$agent) {
@@ -29,3 +29,10 @@ $query = $pdo->prepare(
 );
 $query->execute(['id' => $agent->id]);
 $guichet = $query->fetchObject(Guichet::class);
+
+
+if (!$guichet) {
+  http_response_code(301);
+  header('Location: /404');
+  exit();
+}

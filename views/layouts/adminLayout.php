@@ -1,19 +1,19 @@
 <?php
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
-$url = $params['username'] . '-' . $params['id'];
+// $url = $params['username'] . '-' . $params['id'];
 
 $navLinks = [
   ['text' => "Vue générale", "isTitle" => true],
-  ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => "/$url", 'isTitle' => false],
-  ['text' => "Historiques", 'icon' => 'history', 'link' => "/$url/historiques", 'isTitle' => false],
+  ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => "", 'isTitle' => false],
+  ['text' => "Historiques", 'icon' => 'history', 'link' => "/historiques", 'isTitle' => false],
   ['text' => "Gestion", 'isTitle' => true],
-  ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => "/$url/flux-trafic", 'isTitle' => false],
-  // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/$url/abonnes", 'isTitle' => false],
+  ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => "/flux-trafic", 'isTitle' => false],
+  // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
-  ['text' => "Operators", 'icon' => 'engineering', 'link' => "/$url/operateurs", 'isTitle' => false],
-  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/$url/rapports", 'isTitle' => false],
-  // ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/$url/parametres", 'isTitle' => false],
+  ['text' => "Operators", 'icon' => 'engineering', 'link' => "/operateurs", 'isTitle' => false],
+  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
+  // ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
 ];
 
 ?>
@@ -82,14 +82,14 @@ $navLinks = [
       </div>
       <div class="flex items-center gap-4">
         <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">notifications</button>
-        <a href="/admin/<?= $url ?>/parametres" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
+        <a href="" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
           settings
         </a>
         <a href="/" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
           home
         </a>
         <a
-          href="/admin/<?= $url ?>/parametres"
+          href=""
           class="relative hidden md:inline-flex group cursor-pointer">
           <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
             <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">

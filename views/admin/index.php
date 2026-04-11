@@ -16,7 +16,7 @@ $notifications = [
 /** @var PDO */
 $pdo = $pdo;
 
-$query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id = u.id WHERE fin IS NULL");
+$query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id = u.id WHERE debut IS NOT NULL AND fin IS NULL");
 $query->execute([]);
 $agentsCours = $query->fetchAll();
 

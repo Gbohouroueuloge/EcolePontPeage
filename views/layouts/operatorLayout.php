@@ -2,24 +2,14 @@
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
-$url = $params['username'] . '-' . $params['id'];
-
 $navLinks = [
-  ['name' => "Passage", 'href' => "/operator/$url", 'icon' => "directions_car"],
-  ['name' => "Caisse", 'href' => "/operator/$url/caisse", 'icon' => "payments"],
-  ['name' => "Incident", 'href' => "/operator/$url/incident", 'icon' => "warning"],
-  ['name' => "Mon Shift", 'href' => "/operator/$url/mon-shift", 'icon' => "schedule"],
+  ['name' => "Passage", 'href' => "/operator", 'icon' => "directions_car"],
+  ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
+  ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
+  ['name' => "Mon Shift", 'href' => "/operator/mon-shift", 'icon' => "schedule"],
 ];
 
-$isConnected = $auth->isConnected();
 
-if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user->username) {
-  http_response_code(301);
-  header('Location: /404');
-  exit();
-}
-
-// dd($agent, $guichets);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -72,7 +62,7 @@ if (!$isConnected || $params['id'] != $user->id || $params['username'] != $user-
           <span class="material-symbols-outlined text-slate-600">home</span>
         </a>
         <a
-          href="/operator/<?= $url ?>/mon-shift"
+          href="/operator/mon-shift"
           class="relative inline-flex group cursor-pointer">
           <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
             <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
