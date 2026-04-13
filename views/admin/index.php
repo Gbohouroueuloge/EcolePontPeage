@@ -20,15 +20,19 @@ $query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id
 $query->execute([]);
 $agentsCours = $query->fetchAll();
 
-$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 8");
+$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC");
 $query->execute([]);
 /** @var Paiement[] */
-$payments = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+$paymentsAll = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
 $revenue = 0;
-foreach ($payments as $payment) {
+foreach ($paymentsAll as $payment) {
   $revenue += $payment->montant;
 }
+
+$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 10");
+$query->execute([]);
+$activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
 // dd($payments);
 
@@ -84,11 +88,13 @@ foreach ($payments as $payment) {
         <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Passages</span>
         <span class="material-symbols-outlined text-primary">directions_car</span>
       </div>
-      <div class="font-mono text-4xl font-bold text-primary mb-6"><?= count($payments) ?></div>
+      <div class="font-mono text-4xl font-bold text-primary mb-6"><?= count($paymentsAll) ?></div>
       <div class="flex flex-wrap gap-2">
-        <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">Vl: 3.2k</span>
-        <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">Pl: 1.1k</span>
-        <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">Moto: 592</span>
+        <?php foreach ($activities as $activity) : ?>
+          <span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded uppercase">
+            <?= $activity->immatriculation ?>
+          </span>
+        <?php endforeach ?>
       </div>
     </div>
 
@@ -277,7 +283,7 @@ foreach ($payments as $payment) {
       </div>
 
       <div class="space-y-6 relative before:content-[''] before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
-        <?php foreach ($payments as $payment): ?>
+        <?php foreach ($activities as $activity): ?>
           <?php require 'cardActivity.php'; ?>
         <?php endforeach; ?>
       </div>

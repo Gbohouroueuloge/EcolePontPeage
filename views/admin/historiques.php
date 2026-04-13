@@ -7,6 +7,26 @@ $title = "Historiques";
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
+$where = "WHERE 1=1";
+$par = [];
+
+if (!empty($_GET['q'])) {
+  $where .= " AND v.immatriculation LIKE :immatriculation";
+  $par['immatriculation'] = '%' . $_GET['q'] . '%'; // recherche partielle
+}
+if (!empty($_GET['voie'])) {
+  $where .= " AND p.guichet_id = :guichet_id";
+  $par['guichet_id'] = $_GET['voie'];
+}
+if (!empty($_GET['type'])) {
+  $where .= " AND v.type_vehicule_id = :type_vehicule_id";
+  $par['type_vehicule_id'] = $_GET['type'];
+}
+if (!empty($_GET['paiement'])) {
+  $where .= " AND p.mode_paiement = :mode_paiement";
+  $par['mode_paiement'] = $_GET['paiement'];
+}
+
 /** @var PDO */
 $pdo = $pdo;
 
@@ -18,17 +38,43 @@ $query = $pdo->prepare("SELECT * FROM typevehicule ORDER BY created_at DESC");
 $query->execute();
 $typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
 
-$query = $pdo->prepare("SELECT v.id AS vehicule_id, v.*, p.*, g.id AS guichet_id, g.emplacement, t.id AS type_vehicule_id, t.libelle 
-  FROM paiement p 
-  JOIN guichet g ON p.guichet_id = g.id 
-  JOIN vehicule v ON p.vehicule_id = v.id 
-  JOIN typevehicule t ON v.type_vehicule_id = t.id 
-  ORDER BY p.created_at DESC 
-  LIMIT 8");
+$page    = max(1, (int) ($_GET['page'] ?? 1));
+$perPage = 8;
+$offset  = ($page - 1) * $perPage;
 
-$query->execute([]);
+// Compter le total avec les mêmes filtres
+$countQuery = $pdo->prepare("
+    SELECT COUNT(*) 
+    FROM paiement p 
+    JOIN guichet g ON p.guichet_id = g.id 
+    JOIN vehicule v ON p.vehicule_id = v.id 
+    JOIN typevehicule t ON v.type_vehicule_id = t.id 
+    {$where}
+");
+$countQuery->execute($par);
+$total      = $countQuery->fetchColumn();
+$totalPages = (int) ceil($total / $perPage);
+
+// Requête principale avec LIMIT + OFFSET
+$query = $pdo->prepare("
+    SELECT v.id AS vehicule_id, v.*, p.*, g.id AS guichet_id, g.emplacement, t.id AS type_vehicule_id, t.libelle 
+    FROM paiement p 
+    JOIN guichet g ON p.guichet_id = g.id 
+    JOIN vehicule v ON p.vehicule_id = v.id 
+    JOIN typevehicule t ON v.type_vehicule_id = t.id 
+    {$where}
+    ORDER BY p.created_at DESC 
+    LIMIT {$perPage} OFFSET {$offset}
+");
+$query->execute($par);
 /** @var Paiement[] */
 $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
+
+// Construire l'URL de base en conservant les filtres actifs
+$queryParams = $_GET;
+unset($queryParams['page']); // on gère page séparément
+$baseUrl = '?' . http_build_query($queryParams);
+
 
 // dd($passages);
 ?>
@@ -67,60 +113,74 @@ $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
     <div class="bg-surface/95 backdrop-blur-md py-8">
       <!-- Filter Bar -->
       <form action="" method="get" class="bg-surface-container-low p-4 rounded-xl flex flex-wrap items-center gap-6">
+
+        <!-- Recherche plaque -->
         <div class="flex-1 min-w-50">
-          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Recherche Plaque</label>
+          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">
+            Recherche Plaque
+          </label>
           <div class="relative">
-            <span
-              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
             <input
               class="w-full bg-white border-none rounded-md py-2 pl-10 text-sm font-mono focus:ring-2 focus:ring-secondary-container"
-              placeholder="ABC-1234..." type="text" name="q" />
+              placeholder="ABC-1234..."
+              type="text"
+              name="q"
+              value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" />
           </div>
         </div>
 
+        <!-- Voie -->
         <div>
-          <label
-            class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Voie</label>
-          <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="voie">
+          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Voie</label>
+          <select class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container" name="voie">
             <option value="">Toutes les voies</option>
             <?php foreach ($guichets as $guichet) : ?>
-              <option value="<?= $guichet->id ?>">Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?></option>
-            <?php endforeach; ?>
+              <option value="<?= $guichet->id ?>" <?= ($_GET['voie'] ?? '') == $guichet->id ? 'selected' : '' ?>>
+                Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?>
+              </option>
+            <?php endforeach ?>
           </select>
         </div>
 
+        <!-- Catégorie véhicule -->
         <div>
-          <label
-            class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Catégorie</label>
-          <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="type">
+          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Catégorie</label>
+          <select class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container" name="type">
             <option value="">Toutes les classes</option>
             <?php foreach ($typevehicules as $type) : ?>
-              <option value="<?= $type->id ?>">Cat <?= $type->id ?> - <?= $type->libelle ?></option>
-            <?php endforeach; ?>
+              <option value="<?= $type->id ?>" <?= ($_GET['type'] ?? '') == $type->id ? 'selected' : '' ?>>
+                Cat <?= $type->id ?> - <?= $type->libelle ?>
+              </option>
+            <?php endforeach ?>
           </select>
         </div>
 
+        <!-- Mode de paiement — valeurs alignées sur la DB -->
         <div>
-          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Mode de
-            Paiement</label>
-          <select
-            class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container"
-            name="paiement">
+          <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1.5 tracking-wider">Mode de Paiement</label>
+          <select class="bg-white border-none rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-secondary-container" name="paiement">
             <option value="">Tous les paiements</option>
-            <option value="abonnement">Abonnement</option>
-            <option value="carte">Carte Bancaire</option>
-            <option value="manuel">Manuel</option>
+            <option value="Espece" <?= ($_GET['paiement'] ?? '') === 'Espece'      ? 'selected' : '' ?>>Espèces</option>
+            <option value="Abonnement" <?= ($_GET['paiement'] ?? '') === 'Abonnement'  ? 'selected' : '' ?>>Abonnement</option>
+            <option value="Carte" <?= ($_GET['paiement'] ?? '') === 'Carte'       ? 'selected' : '' ?>>Carte Bancaire</option>
           </select>
         </div>
 
-        <button class="self-end p-2 flex items-center gap-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors">
-          <span class="material-symbols-outlined">filter_list</span>
-          Filtrer
-        </button>
+        <div class="self-end flex gap-2">
+          <button type="submit" class="p-2 flex items-center gap-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors">
+            <span class="material-symbols-outlined">filter_list</span>
+            Filtrer
+          </button>
+          <!-- Reset -->
+          <?php if (!empty(array_filter($_GET ?? []))) : ?>
+            <a href="?" class="p-2 flex items-center gap-2 bg-surface-container-high text-slate-600 rounded-md hover:bg-slate-200 transition-colors text-sm font-medium">
+              <span class="material-symbols-outlined">close</span>
+              Réinitialiser
+            </a>
+          <?php endif ?>
+        </div>
+
       </form>
     </div>
 
@@ -154,16 +214,48 @@ $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
         </div>
 
         <div class="bg-surface-container-low px-8 py-4 flex justify-between items-center">
-          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Affichage de 24 sur 1
-            209 résultats</div>
-          <div class="flex gap-2">
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded bg-white text-primary border border-surface-container shadow-sm">1</button>
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container text-slate-500">2</button>
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container text-slate-500">3</button>
+
+          <!-- Résumé -->
+          <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            Affichage de <?= min($offset + $perPage, $total) ?> sur <?= number_format($total, 0, ',', ' ') ?> résultats
           </div>
+
+          <!-- Pagination -->
+          <?php if ($totalPages > 1) : ?>
+            <div class="flex gap-1 items-center">
+
+              <!-- Première page -->
+              <a href="<?= $baseUrl ?>&page=1"
+                class="w-8 h-8 flex items-center justify-center rounded <?= $page === 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
+                <span class="material-symbols-outlined text-sm">first_page</span>
+              </a>
+
+              <!-- Précédent -->
+              <a href="<?= $baseUrl ?>&page=<?= $page - 1 ?>"
+                class="w-8 h-8 flex items-center justify-center rounded <?= $page === 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
+                <span class="material-symbols-outlined text-sm">chevron_left</span>
+              </a>
+
+              <!-- Page courante -->
+              <span class="px-3 h-8 flex items-center justify-center rounded bg-white text-primary border border-surface-container shadow-sm text-xs font-black">
+                <?= $page ?> / <?= $totalPages ?>
+              </span>
+
+              <!-- Suivant -->
+              <a href="<?= $baseUrl ?>&page=<?= $page + 1 ?>"
+                class="w-8 h-8 flex items-center justify-center rounded <?= $page === $totalPages ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+              </a>
+
+              <!-- Dernière page -->
+              <a href="<?= $baseUrl ?>&page=<?= $totalPages ?>"
+                class="w-8 h-8 flex items-center justify-center rounded <?= $page === $totalPages ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
+                <span class="material-symbols-outlined text-sm">last_page</span>
+              </a>
+
+            </div>
+          <?php endif ?>
+
         </div>
       </div>
     </div>

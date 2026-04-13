@@ -14,29 +14,20 @@ $navLinks = [
 <!DOCTYPE html>
 <html lang="fr">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operator <?= $title ?? 'Péage Bridge' ?></title>
-  <link rel="stylesheet" href="/output.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;family=Public+Sans:wght@400;500;600&amp;family=Inter:wght@400;600;700&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-</head>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . '/layouts/head.php'; ?>
 
 <body class="bg-surface text-on-surface font-body selection:bg-secondary-container/30">
   <header
     class="flex justify-between items-center px-6 h-16 w-full fixed top-0 z-50 bg-white dark:bg-primary  font-['Plus_Jakarta_Sans'] tracking-tight">
     <div class="flex items-center gap-8">
-      <span class="text-xl font-bold tracking-tighter text-primary dark:text-[#fef9f1]">
-        Peage Bridge
-      </span>
+      <a href="/" class="flex lg:flex-row flex-col items-center md:gap-4">
+        <img class="w-10 h-10 flex items-center justify-center rounded-lg" src="/icons/peage_bridge_logo_africain.svg" alt="">
+        <div>
+          <h1 class="font-headline text-xl font-black text-on-primary tracking-tight leading-none">Péage Bridge
+          </h1>
+          <p class="text-xs hidden md:block text-on-primary/60 font-medium tracking-wide">Votre passage simplifié</p>
+        </div>
+      </a>
       <nav class="hidden md:flex gap-6 items-center h-full pt-1">
         <?php foreach ($navLinks as $link) : ?>
           <a

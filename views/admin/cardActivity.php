@@ -9,9 +9,9 @@
   </div>
   <p class="text-sm font-headline font-bold text-primary">
     Paiement Validé - Plaque
-    <span class="uppercase">[<?= $payment->immatriculation ?>]</span>
+    <span class="uppercase">[<?= $activity->immatriculation ?>]</span>
   </p>
   <p class="text-xs text-on-surface-variant font-mono">
-    <?= $payment->getCreatedAt()->format('d/m/Y H:i') ?> • <?= $payment->getPrice() ?> FCFA • Cabine <?= $payment->guichet_id . " - " . $payment->emplacement ?>
+    <?= $activity->getCreatedAt()->format('d/m/Y H:i') ?> • <?= $activity->getPrice() ?> FCFA • Cabine <?= $activity->guichet_id . " - " . $activity->emplacement ?>
   </p>
 </div>

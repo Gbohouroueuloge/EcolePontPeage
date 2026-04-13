@@ -15,26 +15,11 @@ $navLinks = [
   // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
   // ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
 ];
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $title ?? 'Péage Bridge' ?></title>
-  <link rel="stylesheet" href="/output.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;family=Public+Sans:wght@400;500;600&amp;family=Inter:wght@400;600;700&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-</head>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . '/layouts/head.php'; ?>
 
 <body class="bg-surface font-body text-on-surface">
 
@@ -68,12 +53,14 @@ $navLinks = [
       <h2 class="text-2xl font-black text-primary font-headline">
         <?= $title ?>
       </h2>
-      <div class="relative w-full max-w-md hidden md:block">
+
+      <form action="/admin/historiques" class="relative w-full max-w-md hidden md:block">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 text-lg">search</span>
         <input
           class="w-full bg-surface-container-low border-none rounded-md pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-secondary-container transition-all"
-          placeholder="Search infrastructure logs..." type="text" />
-      </div>
+          placeholder="Recherche un paiement (Matricule)" type="search" name="q" />
+      </form>
+
     </div>
     <div class="flex items-center gap-6">
       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-surface-container-highest rounded-full text-xs font-bold text-primary">
@@ -97,7 +84,7 @@ $navLinks = [
             </span>
           </div>
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span> 
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
         </a>
       </div>
     </div>

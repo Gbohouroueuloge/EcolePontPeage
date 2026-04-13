@@ -36,6 +36,26 @@ if (isset($_GET['delete'])) {
   exit;
 }
 
+$where = "";
+$isActive = 'tous';
+if (!empty($_GET['filtre'])) {
+  $filtre = $_GET['filtre'];
+  switch ($filtre) {
+    case 'service':
+      $where = "WHERE ag.guichet_id IS NOT NULL";
+      $isActive = 'service';
+      break;
+    case 'repos':
+      $where = "WHERE ag.guichet_id IS NULL";
+      $isActive = 'repos';
+      break;
+    default:
+      $where = "";
+      $isActive = 'tous';
+      break;
+  }
+}
+
 $query = $pdo->prepare("SELECT COUNT(id) FROM paiement");
 $query->execute([]);
 $Nbrpayment = $query->fetchColumn();
@@ -58,10 +78,32 @@ $agentsAll = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
 
 $agentsActive = array_filter($agentsAll, fn($a) => $a->is_en_cours());
 
+$query = $pdo->prepare("
+    SELECT 
+        a.id AS agent_real_id, 
+        a.*, 
+        u.username, 
+        g.id AS guichet_real_id, 
+        g.emplacement 
+    FROM agent a 
+    JOIN users u ON a.user_id = u.id 
+    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
+    LEFT JOIN guichet g ON ag.guichet_id = g.id
+    {$where}
+");
+$query->execute();
+$agents = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+
 $query = $pdo->prepare("SELECT * FROM guichet ORDER BY created_at ASC");
 $query->execute();
 /** @var Guichet[] */
 $guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
+
+$filtre = [
+  'tous' => 'Tous',
+  'service' => 'Service',
+  'repos' => 'Repos'
+];
 
 ?>
 
@@ -85,7 +127,7 @@ $guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
     </div>
 
     <!-- Compact Stats Row (Bento Style) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-primary">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total Staff</div>
         <div class="font-mono text-3xl font-bold text-primary"><?= count($agentsAll) ?></div>
@@ -109,12 +151,16 @@ $guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
     <!-- Main Data Grid -->
     <div class="bg-surface-container-lowest rounded-xl monolith-shadow overflow-hidden">
       <div class="flex bg-surface-container-low p-1 rounded-lg">
-        <button class="px-4 py-2 text-xs font-bold bg-white shadow-sm rounded-md text-primary">Tous</button>
-        <button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-primary">En service</button>
-        <button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-primary">Repos</button>
+        <?php foreach ($filtre as $key => $value) : ?>
+          <a
+            href="?filtre=<?= $key ?>"
+            class="px-4 py-2 text-xs font-bold <?= !empty($_GET['filtre']) && $_GET['filtre'] == $key ? 'bg-primary text-white' : 'text-slate-500 hover:text-primary' ?> shadow-sm rounded-md text-primary">
+            <?= $value ?>
+          </a>
+        <?php endforeach ?>
       </div>
 
-      <table class="w-full text-left border-collapse">
+      <table class="w-full hidden xl:table text-left border-collapse">
         <thead>
           <tr class="bg-surface-container-low">
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Agent Details</th>
@@ -129,7 +175,7 @@ $guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
           </tr>
         </thead>
         <tbody class="divide-y divide-surface-container-low">
-          <?php foreach ($agentsAll as $agent) : ?>
+          <?php foreach ($agents as $agent) : ?>
             <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -207,6 +253,101 @@ $guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
           <?php endforeach ?>
         </tbody>
       </table>
+
+      <div class="w-full flex xl:hidden flex-col gap-4">
+        <?php foreach ($agents as $agent) : ?>
+          <div class="bg-white rounded-2xl border border-surface-variant shadow-sm overflow-hidden mb-3">
+
+            <!-- Header de la card -->
+            <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low/40 border-b border-surface-variant">
+              <div class="flex items-center gap-3">
+                <div class="inline-flex items-center justify-center border-2 border-surface-container-high overflow-hidden h-10 w-10 rounded-full bg-surface-container-high ring-2 ring-white">
+                  <span class="text-primary uppercase text-lg font-black font-mono">
+                    <?= substr($agent->username, 0, 2) ?>
+                  </span>
+                </div>
+                <div>
+                  <div class="font-bold text-primary text-sm uppercase"><?= $agent->username ?></div>
+                  <div class="font-mono text-[10px] text-slate-400">ID-PRT-<?= $agent->id ?></div>
+                </div>
+              </div>
+
+              <!-- Statut -->
+              <?php if ($agent->is_en_cours()) : ?>
+                <div class="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <span class="text-[10px] font-bold text-emerald-700 uppercase">En Service</span>
+                </div>
+              <?php else : ?>
+                <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-200">
+                  <div class="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">Repos</span>
+                </div>
+              <?php endif ?>
+            </div>
+
+            <!-- Infos -->
+            <div class="px-4 py-3 space-y-2.5">
+
+              <!-- Voie assignée -->
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Voie</span>
+                <?php if ($agent->is_en_cours()) : ?>
+                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
+                    VOIE_<?= $agent->guichet_real_id ?>_<?= $agent->emplacement ?>
+                  </span>
+                <?php else : ?>
+                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
+                <?php endif ?>
+              </div>
+
+              <!-- Transactions -->
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Transactions</span>
+                <span class="font-mono text-sm font-bold text-primary">0</span>
+              </div>
+
+              <!-- Début de service -->
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Début</span>
+                <?php if ($agent->getDateDebut()) : ?>
+                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
+                    <?= $agent->getDateDebut()->format('d/m/Y H:i') ?>
+                  </span>
+                <?php else : ?>
+                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
+                <?php endif ?>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-4 py-3 border-t border-surface-variant bg-surface-container-low/20">
+              <div class="flex items-center gap-2">
+                <select
+                  name="voie"
+                  onchange="window.location.href = '/admin/operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?voie=' + this.value"
+                  class="flex-1 text-xs bg-white rounded-lg border border-surface-variant px-2 py-1.5 text-primary font-semibold shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer">
+                  <option value="" disabled <?= $agent->guichet_real_id === null ? 'selected' : '' ?>>Choisir une voie...</option>
+                  <?php foreach ($guichets as $guichet) : ?>
+                    <option value="<?= $guichet->id ?>" <?= $agent->guichet_real_id == $guichet->id ? 'selected' : '' ?>>
+                      Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?>
+                    </option>
+                  <?php endforeach ?>
+                </select>
+
+                <?php if ($agent->guichet_real_id !== null) : ?>
+                  <a
+                    href="operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?delete"
+                    class="p-1.5 bg-error-container text-error rounded-lg border border-surface-variant hover:bg-error/35 cursor-pointer transition-colors">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                  </a>
+                <?php endif ?>
+              </div>
+            </div>
+          </div>
+        <?php endforeach ?>
+      </div>
+
       <div class="px-6 py-4 bg-surface-container-low/30 flex justify-between items-center">
         <span class="text-xs font-bold text-slate-500">Affichage de 1-3 sur 124 agents</span>
         <div class="flex gap-2">

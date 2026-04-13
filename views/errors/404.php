@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404</title>
   <link rel="stylesheet" href="/output.css">
+  <link rel="shortcut icon" href="icons/favicon.ico" type="image/x-icon">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;family=Public+Sans:wght@400;500;600&amp;family=Inter:wght@400;600;700&amp;display=swap"
     rel="stylesheet" />
@@ -23,11 +24,14 @@
     <!-- Top Navigation (Shell Implementation) -->
     <header class="bg-[#fef9f1] text-primary docked full-width top-0 z-50">
       <div class="flex justify-between items-center w-full px-12 py-8 max-w-screen-2xl mx-auto">
-        <div class="flex items-center gap-4">
-          <span class="text-xl font-black text-primary tracking-tighter font-headline uppercase">
-            Péage Bridge
-          </span>
-        </div>
+        <a href="/" class="flex lg:flex-row flex-col items-center md:gap-4">
+          <img class="w-10 h-10 flex items-center justify-center rounded-lg" src="/icons/peage_bridge_logo_africain.svg" alt="">
+          <div>
+            <h1 class="font-headline text-xl font-black text-primary tracking-tight leading-none">Péage Bridge
+            </h1>
+            <p class="text-xs hidden md:block text-primary/60 font-medium tracking-wide">Votre passage simplifié</p>
+          </div>
+        </a>
         <nav class="hidden md:flex gap-8 items-center">
           <a class="font-['Plus_Jakarta_Sans'] uppercase tracking-[0.2em] font-bold text-[#1d1c17]/60 hover:text-secondary transition-colors duration-300"
             href="/">Accuiel</a>

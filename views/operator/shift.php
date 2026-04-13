@@ -54,8 +54,12 @@ $query->execute(['guichet_id' => $guichet->id]);
 /** @var Paiement[] */
 $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
+$montant = 0;
+foreach ($passages as $passage) {
+  $montant += $passage->montant;
+}
 
-// dd($passages);
+// dd($montant);
 ?>
 
 <main class="pt-24 px-4 md:px-8 mb-24 max-w-7xl mx-auto">
@@ -94,40 +98,33 @@ $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
       <div class="flex justify-between items-start">
         <span
           class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Passages</span>
-        <span class="material-symbols-outlined text-brand-indigo">directions_car</span>
+        <span class="material-symbols-outlined text-secondary">directions_car</span>
       </div>
-      <div class="mono-data text-4xl font-bold text-primary">1,284</div>
-      <div class="flex items-center gap-1 text-xs text-secondary font-bold">
-        <span class="material-symbols-outlined text-xs">trending_up</span>
-        +12% vs hier
+      <div class="mono-data text-4xl font-bold text-secondary">
+        <?= count($passages) ?>
       </div>
     </div>
+
     <!-- Revenue Card -->
     <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
         <span
-          class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Encaissé
-          (FCFA)</span>
+          class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Encaissé (FCFA)</span>
         <span class="material-symbols-outlined text-brand-indigo">payments</span>
       </div>
-      <div class="mono-data text-4xl font-bold text-primary">642,000</div>
-      <div class="flex items-center gap-1 text-xs text-secondary font-bold">
-        <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
-        Espèces: 400k | Tag: 242k
+      <div class="mono-data text-4xl font-bold text-brand-indigo">
+        <?= number_format($montant, 0, ',', ' ') ?>
       </div>
     </div>
+
     <!-- Incidents Card -->
     <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
         <span
           class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Incidents</span>
-        <span class="material-symbols-outlined text-brand-indigo">report_problem</span>
+        <span class="material-symbols-outlined text-error">report_problem</span>
       </div>
-      <div class="mono-data text-4xl font-bold text-primary">03</div>
-      <div class="flex items-center gap-1 text-xs text-error font-bold">
-        <span class="material-symbols-outlined text-xs">warning</span>
-        2 Non-paiements résolus
-      </div>
+      <div class="mono-data text-4xl font-bold text-error">03</div>
     </div>
   </div>
 

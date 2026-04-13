@@ -7,7 +7,7 @@ $auth = $auth;
 
 if (isset($_GET['logout'])) {
   $auth->logout();
-  
+
   http_response_code(301);
   header('Location: /');
   exit;
@@ -16,10 +16,13 @@ if (isset($_GET['logout'])) {
 ?>
 
 <div class="p-8 py-4 flex items-center gap-3">
-  <div class="w-8 h-8 bg-secondary-container rotate-45 flex items-center justify-center shadow-[0_0_15px_rgba(254,190,73,0.4)]">
-    <span class="material-symbols-outlined text-primary -rotate-45 text-sm">link</span>
-  </div>
-  <h1 class="text-xl font-bold tracking-tight text-white font-headline">Péage Bridge</h1>
+  <button class="flex items-center gap-4">
+    <img class="w-10 h-10 flex items-center justify-center rounded-lg" src="/icons/peage_bridge_logo_africain.svg" alt="">
+    <div>
+      <h1 class="font-headline text-xl font-black text-on-primary tracking-tight leading-none">Péage Bridge
+      </h1>
+    </div>
+  </button>
 </div>
 
 <nav class="flex-1 mt-2 px-0">

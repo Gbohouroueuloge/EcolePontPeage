@@ -25,32 +25,16 @@ if (isset($_GET['logout'])) {
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $title ?? 'Péage Bridge' ?></title>
-  <link rel="stylesheet" href="/output.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@700&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;family=Public+Sans:wght@400;500;600&amp;family=Inter:wght@400;600;700&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-</head>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . '/layouts/head.php'; ?>
 
 <body class="bg-surface font-body text-on-surface">
   <!-- TopAppBar -->
   <header class="sticky top-0 z-50 w-full bg-surface-container-lowest shadow-sm">
     <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
       <a href="/" class="flex lg:flex-row flex-col items-center md:gap-4">
-        <div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
-          <span class="material-symbols-outlined text-secondary-container" data-icon="bridge">link</span>
-        </div>
+        <img class="w-10 h-10 flex items-center justify-center rounded-lg" src="/icons/peage_bridge_logo_africain.svg" alt="">
         <div>
           <h1 class="font-headline text-xl font-black text-primary tracking-tight leading-none">Péage Bridge
           </h1>
@@ -69,14 +53,14 @@ if (isset($_GET['logout'])) {
       </nav>
 
       <?php if ($isAdmin) : ?>
-        <?php 
-          $type = "admin";
-          require "badgeUser.php" 
+        <?php
+        $type = "admin";
+        require "badgeUser.php"
         ?>
       <?php elseif ($isconnected): ?>
-        <?php 
-          $type = "operator";
-          require "badgeUser.php" 
+        <?php
+        $type = "operator";
+        require "badgeUser.php"
         ?>
       <?php else: ?>
         <div class="flex items-center gap-3">

@@ -5,8 +5,8 @@
     href="#"
     onclick="toggleUserMenu(event)"
     class="relative inline-flex group cursor-pointer">
-    <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high bg-<?= $type === "admin" ? "primary" : "surface-container" ?> shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-<?= $type === "admin" ? "primary" : "surface-container" ?> group-hover:scale-105">
-      <span class="text-on-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110">
+    <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high <?= $type === "admin" ? "bg-primary group-hover:border-primary text-on-primary" : "bg-surface-container group-hover:border-surface-container text-primary" ?> shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:scale-105">
+      <span class="uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110">
         <?= substr($user->username, 0, 2) ?>
       </span>
     </div>
