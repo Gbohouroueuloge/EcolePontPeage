@@ -8,7 +8,7 @@ $navLinks = [
   ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => "", 'isTitle' => false],
   ['text' => "Historiques", 'icon' => 'history', 'link' => "/historiques", 'isTitle' => false],
   ['text' => "Gestion", 'isTitle' => true],
-  ['text' => "Flux de Trafic", 'icon' => 'leaderboard', 'link' => "/flux-trafic", 'isTitle' => false],
+  ['text' => "Tarifs", 'icon' => 'local_atm', 'link' => "/tarifs", 'isTitle' => false],
   // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
   ['text' => "Operators", 'icon' => 'engineering', 'link' => "/operateurs", 'isTitle' => false],
@@ -31,13 +31,13 @@ $navLinks = [
   <!-- SideNavBar Mobile -->
   <aside id="sidebarMobile"
     class="fixed md:hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)] -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-    <?= require 'asideAdmin.php' ?>
+    <?= require 'components/asideAdmin.php' ?>
   </aside>
 
   <!-- SideNavBar -->
   <aside
     class="fixed hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 md:flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)]">
-    <?= require 'asideAdmin.php' ?>
+    <?= require 'components/asideAdmin.php' ?>
   </aside>
 
   <!-- TopAppBar -->
@@ -62,19 +62,21 @@ $navLinks = [
       </form>
 
     </div>
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-16">
       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-surface-container-highest rounded-full text-xs font-bold text-primary">
         <span class="w-2 h-2 rounded-full bg-green-500"></span>
         État du Système
       </div>
+
       <div class="flex items-center gap-4">
-        <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">notifications</button>
+        <!-- <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">notifications</button>
         <a href="" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
           settings
         </a>
         <a href="/" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
           home
-        </a>
+        </a> -->
+
         <a
           href=""
           class="relative hidden md:inline-flex group cursor-pointer">

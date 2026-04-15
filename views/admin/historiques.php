@@ -202,14 +202,14 @@ $baseUrl = '?' . http_build_query($queryParams);
           </thead>
           <tbody class="divide-y divide-surface-container">
             <?php foreach ($passages as $passage) : ?>
-              <?php require 'cardRowPassage.php' ?>
+              <?php require 'components/cards/cardRowPassage.php' ?>
             <?php endforeach; ?>
           </tbody>
         </table>
 
         <div class="w-full flex xl:hidden flex-col gap-4">
           <?php foreach ($passages as $passage) : ?>
-            <?php require 'cardRowPassageMobile.php' ?>
+            <?php require 'components/cards/cardRowPassageMobile.php' ?>
           <?php endforeach; ?>
         </div>
 

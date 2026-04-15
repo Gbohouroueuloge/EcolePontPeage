@@ -58,23 +58,6 @@ if (!empty($_POST)) {
             value="<?= $_POST['email'] ?? '' ?>" />
         </div>
 
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <input
-              class="h-4 w-4 rounded border-outline-variant/30 text-primary focus:ring-secondary-container"
-              id="remember-me" name="remember-me" type="checkbox" />
-            <label class="ml-2 block text-sm font-label text-on-surface-variant" for="remember-me">
-              Se souvenir de moi
-            </label>
-          </div>
-
-          <div class="text-sm">
-            <a class="font-medium text-[#FF7F50] hover:opacity-80 transition-opacity" href="?reset">
-              Mot de passe oublié ?
-            </a>
-          </div>
-        </div>
-
         <div>
           <button
             class="w-full bg-primary text-on-primary font-label font-semibold py-4 rounded-lg hover:bg-secondary transition-all duration-300 active:scale-[0.98] gold-glow uppercase tracking-widest text-xs"

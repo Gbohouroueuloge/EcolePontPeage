@@ -1,3 +1,24 @@
+<?php
+
+use App\Auth;
+use App\ConnectionBDD;
+
+$auth = new Auth(ConnectionBDD::getPdo());
+
+if ($auth->isAdmin()) {
+  header('Location: /admin ');
+  exit();
+} elseif ($auth->isConnected()) {
+  header('Location: /operator');
+  exit();
+}
+header('Location: ' . $router->url('home.login'));
+exit;
+
+?>
+
+
+
 <main>
   <!-- Hero Section -->
   <section class="relative min-screen pb-32 flex items-center bg-primary overflow-hidden pt-20 asymmetric-clip">

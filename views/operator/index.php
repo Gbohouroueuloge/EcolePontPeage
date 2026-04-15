@@ -8,183 +8,140 @@ use App\Models\Paiement;
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
-/** @var User */
-$user = $user;
+/** @var User   */ $user    = $user;
+/** @var Agent  */ $agent   = $agent;
+/** @var Guichet*/ $guichet = $guichet;
 
-/** @var Agent */
-$agent = $agent;
+/* ═══════════════════════════════════════════════════
+   TRAITEMENT DU FORMULAIRE
+════════════════════════════════════════════════════ */
+$form_success = false;
+$form_error   = null;
 
-/** @var Guichet */
-$guichet = $guichet;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (!$agent->is_en_cours()) {
+    $form_error = "Action impossible : La voie est actuellement FERMÉE.";
+  } else {
+    $immatriculation  = strtoupper(trim($_POST['immatriculation'] ?? ''));
+    $type_vehicule_id = (int)($_POST['type_vehicule_id'] ?? 0);
+    $mode_paiement    = trim($_POST['mode_paiement'] ?? '');
+    $montant          = (float)($_POST['montant'] ?? 0);
 
-$query = $pdo->prepare("SELECT v.id AS vehicule_id, v.immatriculation, p.*, t.id AS type_vehicule_id, t.libelle 
-  FROM paiement p 
-  JOIN vehicule v ON p.vehicule_id = v.id 
-  JOIN typevehicule t ON v.type_vehicule_id = t.id 
-  WHERE p.guichet_id = :guichet_id
-  ORDER BY p.created_at DESC 
-  LIMIT 10");
+    if ($immatriculation && $type_vehicule_id && $mode_paiement && $montant > 0) {
+      try {
+        // Chercher le véhicule, le créer s'il n'existe pas
+        $stmtV = $pdo->prepare("SELECT id FROM vehicule WHERE immatriculation = :immat LIMIT 1");
+        $stmtV->execute(['immat' => $immatriculation]);
+        $vehicule = $stmtV->fetch(PDO::FETCH_OBJ);
 
+        if (!$vehicule) {
+          $stmtI = $pdo->prepare(
+            "INSERT INTO vehicule (immatriculation, type_vehicule_id) VALUES (:immat, :type)"
+          );
+          $stmtI->execute(['immat' => $immatriculation, 'type' => $type_vehicule_id]);
+          $vehicule_id = (int)$pdo->lastInsertId();
+        } else {
+          $vehicule_id = (int)$vehicule->id;
+        }
+
+        // Insérer le paiement
+        $stmtP = $pdo->prepare(
+          "INSERT INTO paiement (vehicule_id, guichet_id, mode_paiement, montant)
+          VALUES (:v, :g, :m, :mt)"
+        );
+        $stmtP->execute([
+          'v'  => $vehicule_id,
+          'g'  => $guichet->id,
+          'm'  => $mode_paiement,
+          'mt' => $montant,
+        ]);
+
+        $form_success = true;
+      } catch (\Exception $e) {
+        $form_error = $e->getMessage();
+      }
+    } else {
+      $form_error = 'Veuillez remplir tous les champs obligatoires.';
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+  RÉCUPÉRATION DE L'HISTORIQUE
+════════════════════════════════════════════════════ */
+$query = $pdo->prepare(
+  "SELECT v.id AS vehicule_id, v.immatriculation, p.*, t.id AS type_vehicule_id, t.libelle
+    FROM paiement p
+    JOIN vehicule v       ON p.vehicule_id       = v.id
+    JOIN typevehicule t   ON v.type_vehicule_id  = t.id
+    WHERE p.guichet_id = :guichet_id
+    ORDER BY p.created_at DESC
+    LIMIT 10"
+);
 $query->execute(['guichet_id' => $guichet->id]);
-/** @var Paiement[] */
+
 $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
+$query = $pdo->prepare("SELECT * FROM typevehicule ORDER BY created_at DESC");
+$query->execute();
+$typevehicules = $query->fetchAll(PDO::FETCH_OBJ);
+
+/* ── Helpers présentation ── */
+$modeIcon = fn(string $m) => match (strtolower($m)) {
+  'espèces', 'especes' => 'payments',
+  'carte'              => 'credit_card',
+  'abonnement'         => 'badge',
+  default              => 'toll',
+};
+$modeBadgeCss = fn(string $m) => match (strtolower($m)) {
+  'espèces', 'especes' => 'bg-brand-success/10 text-brand-success border-brand-success/25',
+  'carte'              => 'bg-brand-indigo/10 text-brand-indigo border-brand-indigo/25',
+  'abonnement'         => 'bg-secondary-container text-secondary border-secondary/25',
+  default              => 'bg-surface-container text-on-surface border-outline-variant',
+};
+$modeTopBar = fn(string $m) => match (strtolower($m)) {
+  'espèces', 'especes' => 'bg-brand-success',
+  'carte'              => 'bg-brand-indigo',
+  'abonnement'         => 'bg-secondary',
+  default              => 'bg-outline-variant',
+};
 ?>
 
-<main class="pt-16 mb-24 min-h-screen flex flex-col">
-  <!-- Status Bar -->
-  <?php if ($agent->is_en_cours()) : ?>
-    <div class="h-16 bg-brand-success flex items-center justify-between px-8 text-white shadow-lg">
-      <div class="flex items-center gap-4">
-        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
-          door_open
-        </span>
-        <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE OUVERTE</span>
-      </div>
 
-      <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-2">
-          <div class="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
-          <span class="font-mono text-sm opacity-90 tracking-tighter">SENS: <?= $guichet->emplacement ?></span>
-        </div>
-        <div class="bg-white/20 px-4 py-1 rounded-sm border border-white/30">
-          <span class="font-mono text-sm font-bold uppercase tracking-widest">Poste #<?= $guichet->id ?></span>
-        </div>
-      </div>
+<main class="pt-16 min-h-screen flex flex-col bg-surface">
+
+  <!-- ── Status Bar ─────────────────────────────── -->
+  <div class="h-14 flex items-center justify-between px-6 md:px-10 text-white shadow-md
+    <?= $agent->is_en_cours() ? 'bg-brand-success' : 'bg-error' ?>">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">
+        <?= $agent->is_en_cours() ? 'door_open' : 'door_front' ?>
+      </span>
+      <span class="font-headline font-extrabold text-sm tracking-[0.2em] uppercase">
+        <?= $agent->is_en_cours() ? 'Voie Ouverte' : 'Voie Fermée' ?>
+      </span>
+      <span class="hidden md:inline-flex items-center gap-1.5 ml-3 bg-white/20 px-3 py-0.5 rounded-full text-xs font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+        <?= $agent->is_en_cours() ? 'EN SERVICE' : 'HORS SERVICE' ?>
+      </span>
     </div>
-  <?php else : ?>
-    <div class="h-16 bg-error flex items-center justify-between px-8 text-white shadow-lg">
-      <div class="flex items-center gap-4">
-        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">
-          door_front
-        </span>
-        <span class="font-headline font-extrabold text-2xl tracking-widest uppercase">VOIE FERMEE</span>
+    <div class="flex items-center gap-3">
+      <span class="hidden md:block font-mono text-xs opacity-80 tracking-widest uppercase">
+        Sens : <?= htmlspecialchars($guichet->emplacement) ?>
+      </span>
+      <div class="bg-white/20 border border-white/30 px-3 py-1 rounded-md">
+        <span class="font-mono text-xs font-bold tracking-widest">Poste #<?= $guichet->id ?></span>
       </div>
-
-      <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-2">
-          <div class="w-2.5 h-2.5 bg-white rounded-full animate-pulse"></div>
-          <span class="font-mono text-sm opacity-90 tracking-tighter">SENS: <?= $guichet->emplacement ?></span>
-        </div>
-        <div class="bg-white/20 px-4 py-1 rounded-sm border border-white/30">
-          <span class="font-mono text-sm font-bold uppercase tracking-widest">Poste #<?= $guichet->id ?></span>
-        </div>
-      </div>
-    </div>
-  <?php endif; ?>
-
-  <div class="grow flex flex-col p-8 gap-8 items-center xl:justify-center max-w-7xl mx-auto w-full">
-    <!-- Central Display Section -->
-    <div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <!-- Vehicle & Plate Identification -->
-      <div class="flex flex-col items-center gap-6">
-        <div class="relative group">
-          <!-- License Plate Card -->
-          <div
-            class="bg-surface-container-lowest p-2 rounded-xl license-plate-shadow border border-primary/5 transform transition-transform group-hover:scale-[1.02]">
-            <!-- Decorative Blue/Yellow Band -->
-            <div class="flex h-3 w-full mb-2 overflow-hidden rounded-t-sm">
-              <div class="w-1/2 bg-brand-indigo"></div>
-              <div class="w-1/2 bg-secondary-container"></div>
-            </div>
-            <div
-              class="px-10 py-8 border-4 border-primary rounded-lg flex items-center justify-center">
-              <span
-                class="font-mono text-center xl:text-[72px] text-[42px] font-bold tracking-[0.2em] text-primary leading-none">AB-123-CD</span>
-            </div>
-          </div>
-          <!-- High-Contrast Status Diamond -->
-          <div
-            class="absolute -top-3 -right-3 w-8 h-8 bg-secondary-container rotate-45 flex items-center justify-center shadow-lg">
-            <span class="material-symbols-outlined -rotate-45 text-primary text-xl"
-              style="font-variation-settings: 'FILL' 1;">check</span>
-          </div>
-        </div>
-        <!-- Category Badge -->
-        <div class="flex items-center gap-4">
-          <div
-            class="flex items-center gap-3 bg-brand-indigo text-white px-8 py-3 rounded-full shadow-[0_8px_15px_rgba(61,58,140,0.3)]">
-            <span class="material-symbols-outlined">motorcycle</span>
-            <span class="font-headline font-bold text-xs uppercase tracking-wider">Moto (Cat 1)</span>
-          </div>
-
-          <a
-            href="operator/incident"
-            class="flex items-center gap-3 bg-error hover:bg-error/80 text-white px-8 py-3 rounded-full shadow-[0_8px_15px_rgba(61,58,140,0.3)]">
-            <span class="material-symbols-outlined">error</span>
-            <span class="font-headline font-bold text-xs uppercase tracking-wider">Signaler un incident</span>
-          </a>
-        </div>
-      </div>
-      <!-- Transaction Summary -->
-      <div class="flex flex-col justify-center items-center lg:items-start space-y-4">
-        <div class="space-y-0 text-center lg:text-left">
-          <p class="text-on-surface-variant font-headline font-bold tracking-[0.15em] text-sm opacity-60">
-            MONTANT DÛ</p>
-          <h1 class="font-mono text-[96px] font-bold text-secondary leading-tight tracking-tighter">
-            500 <span class="text-4xl -ml-4">FCFA</span>
-          </h1>
-        </div>
-        <div class="w-full h-px bg-outline-variant/30"></div>
-        <div class="grid grid-cols-2 gap-8 w-full py-4">
-          <div>
-            <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Origine
-            </p>
-            <p class="font-headline font-bold text-primary">BARI CENTRALE</p>
-          </div>
-          <div>
-            <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Distance
-            </p>
-            <p class="font-mono font-bold text-primary">142.4 KM</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payment Methods - Large Touch Targets -->
-    <div class="w-full grid md:grid-cols-3 gap-6 mt-4">
-      <button
-        class="h-24 bg-brand-success text-white rounded-xl shadow-lg flex items-center justify-center gap-4 transition-all hover:brightness-110 active:scale-95 group">
-        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
-          <span class="material-symbols-outlined text-3xl">payments</span>
-        </div>
-        <span class="font-headline font-extrabold text-2xl tracking-wide uppercase">ESPÈCES</span>
-      </button>
-      <button
-        class="h-24 bg-brand-indigo text-white rounded-xl shadow-lg flex items-center justify-center gap-4 transition-all hover:brightness-110 active:scale-95 group">
-        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center">
-          <span class="material-symbols-outlined text-3xl">credit_card</span>
-        </div>
-        <span class="font-headline font-extrabold text-2xl tracking-wide uppercase">CARTE</span>
-      </button>
-      <button
-        class="h-24 bg-secondary-container text-primary rounded-xl shadow-lg flex items-center justify-center gap-4 transition-all hover:brightness-110 active:scale-95 group">
-        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-3xl">badge</span>
-        </div>
-        <span class="font-headline font-extrabold text-2xl tracking-wide uppercase">ABONNEMENT</span>
-      </button>
     </div>
   </div>
 
-  <!-- Footer: History Row -->
-  <footer class="bg-surface-container-low px-8 py-4 mt-auto">
-    <div class="flex items-center justify-between mb-4">
-      <div class="flex items-center gap-4">
-        <h3 class="font-headline font-bold text-primary-container text-sm flex items-center gap-2">
-          <span class="material-symbols-outlined text-lg">history</span>
-          DERNIERS PASSAGES
-        </h3>
-        <a href="#" class="flex items-center gap-2 hover:text-secondary font-bold">
-          Voir tout
-          <span class="material-symbols-outlined text-sm">keyboard_arrow_right</span>
-        </a>
-      </div>
-    </div>
-    <div class="grid md:grid-cols-5 gap-4">
-      <?php foreach ($passages as $passage): ?>
-        <?php include 'cardsHistoryItem.php'; ?>
-      <?php endforeach; ?>
-    </div>
-  </footer>
+  <!-- ── Mise en page 2 colonnes ─────────────────── -->
+  <div class="flex-1 grid grid-cols-1 xl:grid-cols-[400px_1fr]">
+    <?php require 'components/asideForm.php' ?>
+
+    <?php require 'components/rightColumn.php' ?>
+  </div>
 </main>
+
+
+<?php require_once 'code.php' ?>

@@ -4,11 +4,18 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
 $navLinks = [
   ['name' => "Passage", 'href' => "/operator", 'icon' => "directions_car"],
-  ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
-  ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
-  ['name' => "Mon Shift", 'href' => "/operator/mon-shift", 'icon' => "schedule"],
+  // ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
+  // ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
+  ['name' => "Mon Dashboard", 'href' => "/operator/mon-dashboard", 'icon' => "schedule"],
 ];
 
+if (isset($_GET['logout'])) {
+  $auth->logout();
+
+  http_response_code(301);
+  header("Location : /");
+  exit();
+}
 
 ?>
 <!DOCTYPE html>
@@ -38,22 +45,16 @@ $navLinks = [
         <?php endforeach; ?>
       </nav>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-14">
       <div class="hidden md:flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-lg">
         <span class="material-symbols-outlined text-primary"
           style="font-variation-settings: 'FILL' 1;">sensors</span>
         <span class="font-bold text-primary">Voie #<?= $guichet->id ?></span>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
-          <span class="material-symbols-outlined text-slate-600">notifications</span>
-        </button>
-        <a href="/" class="p-2 transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full active:scale-95">
-          <span class="material-symbols-outlined text-slate-600">home</span>
-        </a>
+
+      <div class="flex items-center gap-6">
         <a
-          href="/operator/mon-shift"
+          href="/operator/mon-dashboard"
           class="relative inline-flex group cursor-pointer">
           <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
             <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
@@ -63,6 +64,11 @@ $navLinks = [
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
         </a>
+
+        <a href="?logout" class="p-2 flex items-center gap-2 transition-all duration-200 bg-error/20 hover:bg-error dark:hover:bg-error text-on-error rounded-full active:scale-95">
+          <span>Se deconnecter</span>
+          <span class="material-symbols-outlined">logout</span>
+        </a>
       </div>
     </div>
   </header>
@@ -71,7 +77,7 @@ $navLinks = [
 
   <!-- BottomNavBar for Mobile (Hidden on Desktop) -->
   <nav
-    class="fixed bottom-0 w-full flex md:hidden justify-around items-center h-20 px-4 bg-[#fef9f1] dark:bg-primary z-50 border-t border-primary/5">
+    class="fixed bottom-0 w-full mt-18 flex md:hidden justify-around items-center h-20 px-4 bg-[#fef9f1] dark:bg-primary z-50 border-t border-primary/5">
     <?php foreach ($navLinks as $link) : ?>
       <a
         href="<?= $link['href'] ?>"

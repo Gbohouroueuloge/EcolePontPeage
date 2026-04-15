@@ -159,8 +159,7 @@
             <span class="font-headline text-2xl font-black tracking-tighter text-white">Péage Bridge</span>
           </div>
           <p class="text-white/60 text-sm leading-relaxed">
-            Leader européen de l'infrastructure connectée. Nous transformons chaque kilomètre en une expérience
-            de fluidité absolue pour des millions de conducteurs.
+            Leader Africain de l'infrastructure connectée. Nous transformons chaque kilomètre en une expérience de fluidité absolue pour des millions de conducteurs.
           </p>
           <div class="flex gap-4">
             <a class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-secondary-container hover:text-primary transition-all"
@@ -211,12 +210,12 @@
             <div class="flex gap-3">
               <span class="material-symbols-outlined text-secondary-container text-xl"
                 data-icon="location_on">location_on</span>
-              <p class="text-white/70 text-sm">Avenue du Grand Pont, 75008 Paris, France</p>
+              <p class="text-white/70 text-sm">Plateau 1, BP32 Abidjan, Côte d'Ivoire</p>
             </div>
             <div class="flex gap-3">
               <span class="material-symbols-outlined text-secondary-container text-xl"
                 data-icon="phone_in_talk">phone_in_talk</span>
-              <p class="text-white/70 text-sm font-mono">+33 (0) 1 23 45 67 89</p>
+              <p class="text-white/70 text-sm font-mono">+225 02 43 61 42 52</p>
             </div>
             <button
               class="w-full py-3 bg-white/5 border border-white/10 rounded-lg text-white font-bold text-sm hover:bg-white/10 transition-colors">
@@ -229,7 +228,7 @@
       <div class="border-t border-white/5 py-8">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-            <p class="text-white/40 text-xs font-mono">© 2025 Péage Bridge. All Rights Reserved.</p>
+            <p class="text-white/40 text-xs font-mono">&copy; 2026 Péage Bridge. Tous droits reservé.</p>
             <nav class="flex gap-6">
               <a class="text-white/40 hover:text-white text-xs transition-colors" href="#">Confidentialité</a>
               <a class="text-white/40 hover:text-white text-xs transition-colors" href="#">CGV / CGU</a>

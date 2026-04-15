@@ -42,7 +42,7 @@ if (isset($_GET['logout'])) {
         </div>
       </a>
 
-      <nav class="hidden md:flex items-center gap-8">
+      <!-- <nav class="hidden md:flex items-center gap-8">
         <?php foreach ($navLinks as $link) : ?>
           <a
             href="<?= $link['href'] ?>"
@@ -50,17 +50,17 @@ if (isset($_GET['logout'])) {
             <?= $link['label'] ?>
           </a>
         <?php endforeach; ?>
-      </nav>
+      </nav> -->
 
       <?php if ($isAdmin) : ?>
         <?php
         $type = "admin";
-        require "badgeUser.php"
+        require "components/badgeUser.php"
         ?>
       <?php elseif ($isconnected): ?>
         <?php
         $type = "operator";
-        require "badgeUser.php"
+        require "components/badgeUser.php"
         ?>
       <?php else: ?>
         <div class="flex items-center gap-3">
@@ -184,7 +184,7 @@ if (isset($_GET['logout'])) {
   </footer>
 
   <!-- BottomNavBar for Mobile (Hidden on Desktop) -->
-  <nav
+  <!-- <nav
     class="fixed bottom-0 w-full flex md:hidden justify-around items-center h-20 px-4 bg-[#fef9f1] dark:bg-primary z-50 border-t border-primary/5">
     <?php foreach ($navLinks as $link) : ?>
       <a
@@ -198,7 +198,7 @@ if (isset($_GET['logout'])) {
         </span>
       </a>
     <?php endforeach; ?>
-  </nav>
+  </nav> -->
 </body>
 
 </html>

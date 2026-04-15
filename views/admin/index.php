@@ -30,7 +30,7 @@ foreach ($paymentsAll as $payment) {
   $revenue += $payment->montant;
 }
 
-$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 10");
+$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 9");
 $query->execute([]);
 $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
@@ -53,7 +53,7 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
   </div>
 
   <!-- KPI Row -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <!-- Revenue Card -->
     <div
       class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,7,25,0.03)] border-l-4 border-secondary relative overflow-hidden">
@@ -126,7 +126,7 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
     </div>
 
     <!-- Incidents Card -->
-    <div
+    <!-- <div
       class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,7,25,0.03)] border-l-4 border-error">
       <div class="flex justify-between items-start mb-4">
         <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Incidents
@@ -138,7 +138,7 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
         <div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
         <span class="text-xs font-bold text-on-surface uppercase tracking-tight">Intervention en cours</span>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <!-- Middle Section: Charts & Activity -->
@@ -284,7 +284,7 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
       <div class="space-y-6 relative before:content-[''] before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
         <?php foreach ($activities as $activity): ?>
-          <?php require 'cardActivity.php'; ?>
+          <?php require 'components/cards/cardActivity.php'; ?>
         <?php endforeach; ?>
       </div>
 

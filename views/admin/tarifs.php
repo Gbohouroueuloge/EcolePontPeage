@@ -2,7 +2,7 @@
 
 use App\Models\TypeVehicule;
 
-$title = "Flux de Trafic";
+$title = "Tarifs";
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 

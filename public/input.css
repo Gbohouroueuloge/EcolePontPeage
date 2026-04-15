@@ -122,8 +122,40 @@
     }
   }
 
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .barrier-arm {
     animation: oscillate 3s ease-in-out infinite;
     transform-origin: 85% 50%;
+  }
+
+  .anim-slide-down {
+    animation: slideDown 0.22s ease-out forwards;
+  }
+
+  .anim-fade-in-up {
+    animation: fadeInUp 0.28s ease-out both;
   }
 }

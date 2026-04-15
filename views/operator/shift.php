@@ -1,7 +1,6 @@
 <?php
-$title = 'Mon Shift';
+$title = 'Mon Dashboard';
 
-use App\Components\Notification;
 use App\Models\User;
 use App\Models\Agent;
 use App\Models\Guichet;
@@ -22,7 +21,7 @@ if (isset($_GET['close'])) {
   $pdo->prepare("UPDATE agent SET fin = NOW() WHERE id = :id")->execute(['id' => $agent->id]);
 
   http_response_code(301);
-  header("Location : /operator/$params[username]-$params[id]");
+  header("Location : /operator");
   exit();
 }
 
@@ -30,7 +29,7 @@ if (isset($_GET['open'])) {
   $pdo->prepare("UPDATE agent SET debut = NOW(), fin = NULL WHERE id = :id")->execute(['id' => $agent->id]);
 
   http_response_code(301);
-  header("Location : /operator/$params[username]-$params[id]/mon-shift");
+  header("Location : /operator/mon-dashboard");
   exit();
 }
 
@@ -72,7 +71,7 @@ foreach ($passages as $passage) {
       </div>
       <div>
         <h2 class="text-white font-headline font-bold text-lg leading-tight">
-          Shift Actuel : <?= date('H\h:i') ?>
+          Heure Actuel : <?= date('H\h:i') ?>
         </h2>
         <p class="text-on-tertiary-container text-sm font-medium tracking-wide">
           DÉBUTÉ À <?= $agent->getDateDebut()->format('H\h:i') ?> • <?= $agent->is_en_cours() ? 'EN COURS' : 'FINI À ' . $agent->getDateFin()->format('H\h:i')  ?>
@@ -92,7 +91,7 @@ foreach ($passages as $passage) {
   </section>
 
   <!-- KPI Cards Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
     <!-- Passages Card -->
     <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
@@ -118,14 +117,14 @@ foreach ($passages as $passage) {
     </div>
 
     <!-- Incidents Card -->
-    <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
+    <!-- <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
         <span
           class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Incidents</span>
         <span class="material-symbols-outlined text-error">report_problem</span>
       </div>
       <div class="mono-data text-4xl font-bold text-error">03</div>
-    </div>
+    </div> -->
   </div>
 
   <!-- Two Column Layout: Table & Profile -->
@@ -135,9 +134,6 @@ foreach ($passages as $passage) {
       <div class="flex items-center justify-between">
         <h3 class="font-headline font-extrabold text-2xl tracking-tight text-primary">Historique de passage
         </h3>
-        <button class="text-sm font-bold text-secondary flex items-center gap-1">
-          VOIR TOUT <span class="material-symbols-outlined text-sm">arrow_forward</span>
-        </button>
       </div>
       <div class="bg-surface-container-lowest rounded-xl overflow-hidden ghost-border">
         <table class="w-full text-left border-collapse">
@@ -158,7 +154,7 @@ foreach ($passages as $passage) {
           </thead>
           <tbody class="divide-y divide-surface-container">
             <?php foreach ($passages as $passage) : ?>
-              <?php require 'cardRowPassage.php' ?>
+              <?php require 'components/cards/cardRowPassage.php' ?>
             <?php endforeach; ?>
           </tbody>
         </table>

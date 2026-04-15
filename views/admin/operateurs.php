@@ -78,21 +78,6 @@ $agentsAll = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
 
 $agentsActive = array_filter($agentsAll, fn($a) => $a->is_en_cours());
 
-$query = $pdo->prepare("
-    SELECT 
-        a.id AS agent_real_id, 
-        a.*, 
-        u.username, 
-        g.id AS guichet_real_id, 
-        g.emplacement 
-    FROM agent a 
-    JOIN users u ON a.user_id = u.id 
-    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
-    LEFT JOIN guichet g ON ag.guichet_id = g.id
-    {$where}
-");
-$query->execute();
-$agents = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
 
 $query = $pdo->prepare("SELECT * FROM guichet ORDER BY created_at ASC");
 $query->execute();
@@ -105,6 +90,35 @@ $filtre = [
   'repos' => 'Repos'
 ];
 
+
+$perPage = 8;
+$currentPage = (int)($_GET['page'] ?? 1);
+if ($currentPage <= 0) $currentPage = 1;
+
+$countQuery = $pdo->query("SELECT COUNT(id) FROM agent");
+$total = (int)$countQuery->fetchColumn();
+$pages = ceil($total / $perPage);
+$offset = ($currentPage - 1) * $perPage;
+
+$query = $pdo->prepare("
+    SELECT 
+        a.id AS agent_real_id, 
+        a.*, 
+        u.username, 
+        g.id AS guichet_real_id, 
+        g.emplacement 
+    FROM agent a 
+    JOIN users u ON a.user_id = u.id 
+    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
+    LEFT JOIN guichet g ON ag.guichet_id = g.id
+    ORDER BY created_at DESC 
+    LIMIT :limit OFFSET :offset
+");
+$query->bindValue('limit', $perPage, PDO::PARAM_INT);
+$query->bindValue('offset', $offset, PDO::PARAM_INT);
+$query->execute();
+
+$operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
 ?>
 
 <main class="md:ml-72 pt-20 px-8 pb-12 relative">
@@ -175,7 +189,7 @@ $filtre = [
           </tr>
         </thead>
         <tbody class="divide-y divide-surface-container-low">
-          <?php foreach ($agents as $agent) : ?>
+          <?php foreach ($operateurs as $agent) : ?>
             <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -255,7 +269,7 @@ $filtre = [
       </table>
 
       <div class="w-full flex xl:hidden flex-col gap-4">
-        <?php foreach ($agents as $agent) : ?>
+        <?php foreach ($operateurs as $agent) : ?>
           <div class="bg-white rounded-2xl border border-surface-variant shadow-sm overflow-hidden mb-3">
 
             <!-- Header de la card -->
@@ -348,15 +362,25 @@ $filtre = [
         <?php endforeach ?>
       </div>
 
-      <div class="px-6 py-4 bg-surface-container-low/30 flex justify-between items-center">
-        <span class="text-xs font-bold text-slate-500">Affichage de 1-3 sur 124 agents</span>
+      <div class="flex items-center justify-between mt-6 px-4">
+        <div class="text-xs font-mono text-on-surface-variant uppercase tracking-widest">
+          Page <?= $currentPage ?> sur <?= $pages ?>
+        </div>
+
         <div class="flex gap-2">
-          <button class="p-2 bg-white rounded border border-surface-variant text-primary hover:bg-slate-50">
-            <span class="material-symbols-outlined text-xs">chevron_left</span>
-          </button>
-          <button class="p-2 bg-white rounded border border-surface-variant text-primary hover:bg-slate-50">
-            <span class="material-symbols-outlined text-xs">chevron_right</span>
-          </button>
+          <?php if ($currentPage > 1): ?>
+            <a href="?page=<?= $currentPage - 1 ?>"
+              class="flex items-center gap-1 px-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-xs font-bold uppercase hover:bg-surface-container-high transition-colors">
+              <span class="material-symbols-outlined text-sm">chevron_left</span> Précédent
+            </a>
+          <?php endif; ?>
+
+          <?php if ($currentPage < $pages): ?>
+            <a href="?page=<?= $currentPage + 1 ?>"
+              class="flex items-center gap-1 px-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-xs font-bold uppercase hover:bg-surface-container-high transition-colors">
+              Suivant <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </a>
+          <?php endif; ?>
         </div>
       </div>
     </div>
