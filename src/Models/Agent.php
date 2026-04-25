@@ -6,6 +6,7 @@ class Agent extends User
 {
   public ?int $id;
   public ?int $user_id;
+  public ?int $guichet_id;
   public ?string $fin, $debut;
 
   public function getDateDebut(): ?\DateTime
@@ -24,7 +25,7 @@ class Agent extends User
     $fin = $this->getDateFin();
 
     // Si pas de date de début définie, l'agent n'est pas en service
-    if ($debut === null) {
+    if ($this->guichet_id === null || $debut === null) {
       return false;
     }
 

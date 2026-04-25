@@ -6,21 +6,15 @@ $title = "Dashboard";
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
-$notifications = [
-  ['title' => "Paiement Validé - Plaque [AA-456-ZZ]", 'text' => "14:42:05 • 8 200 FCFA • Cabine 04", 'type' => "payments", 'color' => ["bg-secondary-container", "text-primary"]],
-  ['title' => "Refus de Passage - Badge Invalide", 'text' => "14:39:12 • Voie Express 02", 'type' => "report", 'color' => ["bg-error-container", "text-error"]],
-  ['title' => "Agent Jean D. en Pause", 'text' => "14:35:00 • Relève Secteur Sud", 'type' => "person", 'color' => ["bg-surface-container-highest", "text-primary"]],
-  ['title' => "Check-up Capteur Laser L04", 'text' => "14:28:10 • Statut: Opérationnel", 'type' => "visibility", 'color' => ["bg-surface-container-highest", "text-primary"]],
-];
-
 /** @var PDO */
 $pdo = $pdo;
 
-$query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id = u.id WHERE debut IS NOT NULL AND fin IS NULL");
+$query = $pdo->prepare("SELECT u.username FROM agent a JOIN users u ON a.user_id = u.id WHERE guichet_id IS NOT NULL AND debut IS NOT NULL AND fin IS NULL");
 $query->execute([]);
 $agentsCours = $query->fetchAll();
 
 $query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC");
+
 $query->execute([]);
 /** @var Paiement[] */
 $paymentsAll = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
@@ -34,7 +28,6 @@ $query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatri
 $query->execute([]);
 $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
-// dd($payments);
 
 ?>
 

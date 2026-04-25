@@ -51,6 +51,7 @@ $countQuery = $pdo->prepare("
     JOIN typevehicule t ON v.type_vehicule_id = t.id 
     {$where}
 ");
+
 $countQuery->execute($par);
 $total      = $countQuery->fetchColumn();
 $totalPages = (int) ceil($total / $perPage);
@@ -70,13 +71,12 @@ $query->execute($par);
 /** @var Paiement[] */
 $passages = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
-// Construire l'URL de base en conservant les filtres actifs
+$query = $pdo->prepare("SELECT * FROM paiement ORDER BY created_at DESC LIMIT 9");
+
 $queryParams = $_GET;
-unset($queryParams['page']); // on gère page séparément
+unset($queryParams['page']);
 $baseUrl = '?' . http_build_query($queryParams);
 
-
-// dd($passages);
 ?>
 
 
@@ -99,11 +99,12 @@ $baseUrl = '?' . http_build_query($queryParams);
 
       <div class="flex gap-4">
         <div class="text-right">
-          <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-1">Capteurs
-            Live</span>
+          <span class="block text-[10px] uppercase font-bold text-slate-400 tracking-widest mb-1">
+            Nombre de passages
+          </span>
           <div class="flex items-center gap-2 text-primary font-mono font-bold text-lg">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            4 281 <span class="text-slate-400 text-xs">ACTUEL</span>
+            <?= $total ?> <span class="text-slate-400 text-xs">ACTUEL</span>
           </div>
         </div>
       </div>
@@ -164,6 +165,7 @@ $baseUrl = '?' . http_build_query($queryParams);
             <option value="Espece" <?= ($_GET['paiement'] ?? '') === 'Espece'      ? 'selected' : '' ?>>Espèces</option>
             <option value="Abonnement" <?= ($_GET['paiement'] ?? '') === 'Abonnement'  ? 'selected' : '' ?>>Abonnement</option>
             <option value="Carte" <?= ($_GET['paiement'] ?? '') === 'Carte'       ? 'selected' : '' ?>>Carte Bancaire</option>
+            <option value="Mobile Money" <?= ($_GET['paiement'] ?? '') === 'Mobile Money'       ? 'selected' : '' ?>>Mobile Money</option>
           </select>
         </div>
 

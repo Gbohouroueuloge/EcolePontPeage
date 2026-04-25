@@ -12,8 +12,8 @@ $navLinks = [
   // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
   ['text' => "Operators", 'icon' => 'engineering', 'link' => "/operateurs", 'isTitle' => false],
-  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
-  // ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
+  ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
+  ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
 ];
 ?>
 <!DOCTYPE html>

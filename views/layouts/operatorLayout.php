@@ -4,8 +4,7 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'operator/variables.php';
 
 $navLinks = [
   ['name' => "Passage", 'href' => "/operator", 'icon' => "directions_car"],
-  // ['name' => "Caisse", 'href' => "/operator/caisse", 'icon' => "payments"],
-  // ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
+  ['name' => "Incident", 'href' => "/operator/incident", 'icon' => "warning"],
   ['name' => "Mon Dashboard", 'href' => "/operator/mon-dashboard", 'icon' => "schedule"],
 ];
 

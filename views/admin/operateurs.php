@@ -42,11 +42,11 @@ if (!empty($_GET['filtre'])) {
   $filtre = $_GET['filtre'];
   switch ($filtre) {
     case 'service':
-      $where = "WHERE ag.guichet_id IS NOT NULL";
+      $where = "WHERE a.guichet_id IS NOT NULL";
       $isActive = 'service';
       break;
     case 'repos':
-      $where = "WHERE ag.guichet_id IS NULL";
+      $where = "WHERE a.guichet_id IS NULL";
       $isActive = 'repos';
       break;
     default:
@@ -69,8 +69,7 @@ $query = $pdo->prepare("
         g.emplacement 
     FROM agent a 
     JOIN users u ON a.user_id = u.id 
-    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
-    LEFT JOIN guichet g ON ag.guichet_id = g.id
+    LEFT JOIN guichet g ON a.guichet_id = g.id
 ");
 
 $query->execute();
@@ -106,11 +105,12 @@ $query = $pdo->prepare("
         a.*, 
         u.username, 
         g.id AS guichet_real_id, 
+        g.slug,
         g.emplacement 
     FROM agent a 
     JOIN users u ON a.user_id = u.id 
-    LEFT JOIN agent_guichet ag ON a.id = ag.agent_id 
-    LEFT JOIN guichet g ON ag.guichet_id = g.id
+    LEFT JOIN guichet g ON a.guichet_id = g.id
+    {$where}
     ORDER BY created_at DESC 
     LIMIT :limit OFFSET :offset
 ");
@@ -133,11 +133,12 @@ $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
           Gestion des Opérateurs
         </h2>
       </div>
-      <button
+      <a
+        href="?new"
         class="bg-primary text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 gold-glow hover:bg-secondary transition-all">
         <span class="material-symbols-outlined text-sm">add</span>
         Ajouter un agent
-      </button>
+      </a>
     </div>
 
     <!-- Compact Stats Row (Bento Style) -->
@@ -221,7 +222,7 @@ $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
               <td class="px-6 py-4">
                 <?php if ($agent->is_en_cours()) : ?>
                   <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
-                    VOIE_<?= $agent->guichet_real_id ?>_<?= $agent->emplacement ?>
+                    <?= $agent->slug ?>
                   </span>
                 <?php else : ?>
                   <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>

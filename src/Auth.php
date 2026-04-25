@@ -53,13 +53,8 @@ class Auth
       $_SESSION['user'] = $user->id;
 
       if ($user->role === 'operateur') {
-        $query = $this->pdo->prepare("
-        INSERT INTO agent (user_id, debut, fin) 
-        VALUES (:user_id, NOW(), NULL)
-        ON DUPLICATE KEY UPDATE 
-            debut = NOW(), 
-            fin = NULL
-        ");
+        $query = $this->pdo->prepare("INSERT INTO agent (user_id, debut, fin) VALUES (:user_id, NOW(), NULL) ON DUPLICATE KEY UPDATE debut = NOW(), fin = NULL");
+
         $query->execute(["user_id" => $user->id]);
       }
 
@@ -80,10 +75,7 @@ class Auth
 
     $id = $this->pdo->lastInsertId();
     
-    $query = $this->pdo->prepare("
-    INSERT INTO agent (user_id, debut, fin) 
-    VALUES (:user_id, NULL, NULL)
-    ");
+    $query = $this->pdo->prepare("INSERT INTO agent (user_id, debut, fin) VALUES (:user_id, NOW(), NULL) ON DUPLICATE KEY UPDATE debut = NOW(), fin = NULL");
     $query->execute(["user_id" => $id]);
 
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();

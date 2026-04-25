@@ -7,6 +7,7 @@ $iconVehicule = [
 ];
 
 $color = [
+  "Espèces" => "brand-success",
   "Espece" => "brand-success",
   "Mobile Money" => "inverse-primary",
   "Carte" => "brand-indigo",

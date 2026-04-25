@@ -13,11 +13,9 @@ $pdo = ConnectionBDD::getPdo();
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
 
 $pdo->exec("TRUNCATE TABLE users");
-$pdo->exec("TRUNCATE TABLE typevehicule");
 $pdo->exec("TRUNCATE TABLE vehicule");
 $pdo->exec("TRUNCATE TABLE agent");
 $pdo->exec("TRUNCATE TABLE guichet");
-$pdo->exec("TRUNCATE TABLE agent_guichet");
 
 $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
@@ -27,23 +25,13 @@ $pdo->exec("INSERT INTO users (username, email, password, role) VALUES ('admin',
 
 $pdo->exec("INSERT INTO users (username, email, password, role) VALUES ('Alex', 'alex@gmail.com', '$pswdHash2', 'operateur')");
 
-$pdo->exec("INSERT INTO agent (user_id) VALUES (2)");
-
 for ($i = 0; $i < 8; $i++) {
   $direction = ['Nord', 'Sud', 'Ouest', 'Est', 'Nord-Est', 'Nord-Ouest', 'Sud-Est', 'Sud-Ouest'];
 
   $pdo->exec("INSERT INTO guichet (emplacement) VALUES ('{$direction[$i]}')");
 }
 
-for ($i = 1; $i <= 5; ++$i) {
-  $price = rand(500, 5500);
-  $libelle = "category $i";
-
-  // Utilisation d'une requête préparée (fortement recommandé)
-  $stmt = $pdo->exec("INSERT INTO typevehicule (libelle, price) VALUES ('$libelle', $price)");
-}
-
-$pdo->exec("INSERT INTO agent_guichet (agent_id, guichet_id) VALUES (1, 1)");
+$pdo->exec("INSERT INTO agent (user_id) VALUES (2)");
 
 $stmt = $pdo->prepare("INSERT INTO vehicule (immatriculation, type_vehicule_id, marque, modele, couleur) 
                       VALUES (:imma, :type, :marque, :modele, :color)");

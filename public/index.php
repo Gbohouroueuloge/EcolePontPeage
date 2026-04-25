@@ -24,6 +24,7 @@ $routerAdmin = new App\Router(dirname(__DIR__) . '/views');
 $routerAdmin
   ->get('/admin', 'admin/index', 'admin.index')
   ->get('/admin/tarifs', 'admin/tarifs', 'admin.tarifs')
+  ->post('/admin/tarifs', 'admin/tarifs', 'admin.tarifs.post')
   ->get('/admin/abonnes', 'admin/abonnes', 'admin.abonnes')
   ->get('/admin/historiques', 'admin/historiques', 'admin.historiques')
   ->get('/admin/operateurs', 'admin/operateurs', 'admin.operateurs')

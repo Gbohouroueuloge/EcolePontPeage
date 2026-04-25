@@ -10,7 +10,7 @@ $title = "Rapports";
 
 <!-- Sidebar offcanvas -->
 <aside id="sidebar"
-  class="fixed top-0 left-0 h-full w-80 bg-surface-container-low z-50 flex flex-col gap-8 p-6 overflow-y-auto shadow-2xl -translate-x-full transition-transform duration-300 ease-in-out">
+  class="fixed top-0 left-140 h-full w-80 bg-surface-container-low z-50 flex flex-col gap-8 p-6 overflow-y-auto shadow-2xl -translate-x-full transition-transform duration-300 ease-in-out">
 
   <!-- Header du sidebar -->
   <div class="flex items-center justify-between pt-4">
