@@ -72,7 +72,7 @@ if (isset($_GET['logout'])) {
     </div>
   </header>
 
-  <?= $content ?>
+  <?= $content ?? '' ?>
 
   <!-- BottomNavBar for Mobile (Hidden on Desktop) -->
   <nav

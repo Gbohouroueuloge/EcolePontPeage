@@ -2,7 +2,7 @@
   <img class="h-10 w-10 rounded-lg bg-white/10 p-1.5" src="/icons/peage_bridge_logo_africain.svg" alt="Peage Bridge">
   <div>
     <div class="font-headline text-lg font-black text-white">Peage Bridge</div>
-    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Back Office</div>
+    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">Superviseur</div>
   </div>
 </div>
 
@@ -15,14 +15,9 @@
     <?php else : ?>
       <a
         href="<?= $link['link'] ?>"
-        class="mb-2 flex items-center justify-between gap-3 px-6 py-2 transition-all <?= $title === $link['text'] ? 'border-l-4 border-secondary-container bg-white/5 text-secondary-container active-nav-glow' : 'text-slate-400 hover:bg-white/10 hover:text-white' ?>">
-        <span class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-lg"><?= $link['icon'] ?></span>
-          <span class="text-sm font-medium"><?= $link['text'] ?></span>
-        </span>
-        <?php if (!empty($link['badge'])) : ?>
-          <span class="rounded-full bg-secondary-container px-2 py-0.5 text-[10px] font-black text-primary"><?= $link['badge'] ?></span>
-        <?php endif; ?>
+        class="mb-2 flex items-center gap-3 px-6 py-2 transition-all <?= $title === $link['text'] ? 'border-l-4 border-secondary-container bg-white/5 text-secondary-container active-nav-glow' : 'text-slate-400 hover:bg-white/10 hover:text-white' ?>">
+        <span class="material-symbols-outlined text-lg"><?= $link['icon'] ?></span>
+        <span class="text-sm font-medium"><?= $link['text'] ?></span>
       </a>
     <?php endif; ?>
   <?php endforeach; ?>
@@ -37,13 +32,13 @@
     </div>
     <div>
       <p class="text-xs font-bold text-white"><?= htmlspecialchars($user->username ?? '') ?></p>
-      <p class="mt-1 text-[10px] text-slate-400">Compte administrateur</p>
+      <p class="mt-1 text-[10px] text-slate-400"><?= htmlspecialchars($user->email ?? '') ?></p>
     </div>
   </div>
 
   <div class="mt-4 rounded-2xl bg-white/5 p-4">
-    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-500">Flux admin</div>
-    <div class="mt-2 text-sm font-bold text-white"><?= $adminUnreadCount ?? 0 ?> alerte(s) a traiter</div>
+    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-500">Zone</div>
+    <div class="mt-2 text-sm font-bold text-white"><?= htmlspecialchars($supervisorProfile->zone_nominale ?? 'Non definie') ?></div>
   </div>
 
   <a

@@ -1,21 +1,28 @@
 <?php
+
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
-// $url = $params['username'] . '-' . $params['id'];
 
 $navLinks = [
-  ['text' => "Vue générale", "isTitle" => true],
-  ['text' => "Dashboard", 'icon' => 'dashboard', 'link' => "", 'isTitle' => false],
-  ['text' => "Historiques", 'icon' => 'history', 'link' => "/historiques", 'isTitle' => false],
-  ['text' => "Gestion", 'isTitle' => true],
-  ['text' => "Tarifs", 'icon' => 'local_atm', 'link' => "/tarifs", 'isTitle' => false],
-  ['text' => "Messages", 'icon' => 'message', 'link' => "/messages", 'isTitle' => false],
-  // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/abonnes", 'isTitle' => false],
-  ['text' => "Système", 'isTitle' => true],
-  ['text' => "Operators", 'icon' => 'engineering', 'link' => "/operateurs", 'isTitle' => false],
-  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
-  ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
+  ['text' => 'Pilotage', 'isTitle' => true],
+  ['text' => 'Dashboard', 'icon' => 'dashboard', 'link' => '/admin', 'isTitle' => false],
+  ['text' => 'Analytics', 'icon' => 'insights', 'link' => '/admin/analytics', 'isTitle' => false],
+  ['text' => 'Historiques', 'icon' => 'history', 'link' => '/admin/historiques', 'isTitle' => false],
+  ['text' => 'Rapports', 'icon' => 'analytics', 'link' => '/admin/rapports', 'isTitle' => false],
+  ['text' => 'Organisation', 'isTitle' => true],
+  ['text' => 'Utilisateurs', 'icon' => 'group', 'link' => '/admin/utilisateurs', 'isTitle' => false],
+  ['text' => 'Operateurs', 'icon' => 'engineering', 'link' => '/admin/operateurs', 'isTitle' => false],
+  ['text' => 'Messages', 'icon' => 'message', 'link' => '/admin/messages', 'isTitle' => false, 'badge' => $adminUnreadCount],
+  ['text' => 'Systeme', 'isTitle' => true],
+  ['text' => 'Tarifs', 'icon' => 'local_atm', 'link' => '/admin/tarifs', 'isTitle' => false],
+  ['text' => 'Parametres', 'icon' => 'settings', 'link' => '/admin/parametres', 'isTitle' => false],
 ];
+
+if (isset($_GET['logout'])) {
+  $auth->logout();
+  header('Location: /');
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -23,100 +30,67 @@ $navLinks = [
 <?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . '/layouts/head.php'; ?>
 
 <body class="bg-surface font-body text-on-surface">
+  <div id="sidebar-overlay" class="fixed inset-0 z-40 bg-black/20 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
 
-  <!-- Overlay (mobile only) -->
-  <div id="sidebar-overlay"
-    class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden">
-  </div>
-
-  <!-- SideNavBar Mobile -->
-  <aside id="sidebarMobile"
-    class="fixed md:hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)] -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-    <?= require 'components/asideAdmin.php' ?>
+  <aside id="sidebarMobile" class="fixed left-0 top-0 z-50 flex h-screen w-64 -translate-x-full flex-col bg-primary shadow-[0_0_24px_rgba(0,7,25,0.22)] transition-transform duration-300 md:hidden">
+    <?= require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'layouts/components/asideAdmin.php' ?>
   </aside>
 
-  <!-- SideNavBar -->
-  <aside
-    class="fixed hidden left-0 top-0 h-screen w-60 bg-primary dark:bg-primary z-50 md:flex flex-col shadow-[0_0_20px_rgba(201,144,26,0.15)]">
-    <?= require 'components/asideAdmin.php' ?>
+  <aside class="fixed left-0 top-0 z-50 hidden h-screen w-64 flex-col bg-primary shadow-[0_0_24px_rgba(0,7,25,0.22)] md:flex overflow-y-auto" style="scrollbar-width: none;">
+    <?= require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'layouts/components/asideAdmin.php' ?>
   </aside>
 
-  <!-- TopAppBar -->
-  <header class="fixed top-0 left-0 md:left-60 right-0 h-16 bg-[#fef9f1] flex justify-between items-center px-8 z-40">
-    <div class="flex items-center gap-8 flex-1">
-
-      <!-- Hamburger (mobile only) -->
-      <button id="sidebar-toggle"
-        class="md:hidden p-2 -ml-2 rounded-md hover:bg-surface-container-high transition-all text-primary">
+  <header class="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between bg-[#fef9f1] px-6 md:left-64 md:px-8">
+    <div class="flex flex-1 items-center gap-6">
+      <button id="sidebar-toggle" class="rounded-md p-2 text-primary transition hover:bg-surface-container-high md:hidden">
         <span class="material-symbols-outlined">menu</span>
       </button>
 
-      <h2 class="text-2xl font-black text-primary font-headline">
-        <?= $title ?>
-      </h2>
-
-      <form action="/admin/historiques" class="relative w-full max-w-md hidden md:block">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/40 text-lg">search</span>
-        <input
-          class="w-full bg-surface-container-low border-none rounded-md pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-secondary-container transition-all"
-          placeholder="Recherche un paiement (Matricule)" type="search" name="q" />
-      </form>
-
-    </div>
-    <div class="flex items-center gap-16">
-      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-surface-container-highest rounded-full text-xs font-bold text-primary">
-        <span class="w-2 h-2 rounded-full bg-green-500"></span>
-        État du Système
-      </div>
-
-      <div class="flex items-center gap-4">
-        <!-- <button class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">notifications</button>
-        <a href="" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
-          settings
-        </a>
-        <a href="/" class="material-symbols-outlined text-slate-500 hover:text-primary transition-all">
-          home
-        </a> -->
-
-        <a
-          href=""
-          class="relative hidden md:inline-flex group cursor-pointer">
-          <div class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high bg-surface-container shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary group-hover:scale-105">
-            <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
-              <?= substr($user->username, 0, 2) ?>
-            </span>
-          </div>
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
-          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full animate-ping opacity-75"></span>
-        </a>
+      <div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">Administration</div>
+        <h2 class="font-headline text-2xl font-black text-primary"><?= $title ?></h2>
       </div>
     </div>
+
+    <div class="hidden items-center gap-3 rounded-full bg-surface-container-highest px-4 py-2 text-xs font-bold text-primary md:flex">
+      <span class="w-2 h-2 rounded-full bg-green-500"></span>
+      <?= $adminUnreadCount ?> message(s) non lu(s)
+    </div>
+
+    <a
+      href="?logout"
+      class="ml-3 flex items-center justify-center gap-2 rounded-2xl border border-error/40 px-4 py-1 text-sm font-bold text-error transition hover:bg-white/5">
+      <span class="material-symbols-outlined text-lg">logout</span>
+      Deconnexion
+    </a>
   </header>
 
-  <?= $content ?>
+  <?= $content ?? '' ?>
 
   <script>
     const toggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebarMobile');
     const overlay = document.getElementById('sidebar-overlay');
 
-    function openSidebar() {
-      sidebar.classList.remove('-translate-x-full');
-      overlay.classList.remove('opacity-0', 'pointer-events-none');
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      });
     }
 
-    function closeSidebar() {
-      if (window.innerWidth < 768) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('opacity-0', 'pointer-events-none');
       }
-    }
-
-    toggle.addEventListener('click', openSidebar);
-    overlay.addEventListener('click', closeSidebar);
-    document.addEventListener('keydown', e => e.key === 'Escape' && closeSidebar());
+    });
   </script>
-
 </body>
 
 </html>

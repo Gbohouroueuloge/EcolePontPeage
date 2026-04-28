@@ -6,7 +6,7 @@ use App\Models\Guichet;
 // Chargement des variables et de la connexion PDO
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
-$title = "Operators";
+$title = "Operateurs";
 $isOpen = false;
 
 /** @var PDO */
@@ -18,7 +18,7 @@ $pdo = $pdo;
 
 // Assignation d'un agent à une voie (guichet)
 if (isset($_GET['voie'])) {
-  $agentId = $params['operateur_id'];
+  $agentId = $params['operateur_id'] ?? null;
   $voie    = (int) $_GET['voie'];
 
   // Mise à jour directe de la table 'agent' selon le schéma pont_peage2
@@ -31,7 +31,7 @@ if (isset($_GET['voie'])) {
 
 // Mise au repos de l'agent (suppression de l'assignation)
 if (isset($_GET['delete'])) {
-  $agentId = $params['operateur_id'];
+  $agentId = $params['operateur_id'] ?? null;
 
   // On passe le guichet_id à NULL pour libérer l'agent
   $stmt = $pdo->prepare("UPDATE agent SET guichet_id = NULL, date_assignation = NULL, debut = NULL WHERE id = ?");
@@ -128,6 +128,10 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
           Gestion des Opérateurs
         </h2>
       </div>
+
+      <a href="/admin/utilisateurs" class="px-6 py-3 bg-primary text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
+        Ajouter un operateur
+      </a>
     </div>
 
     <!-- Compact Stats Row (Bento Style) -->
@@ -216,7 +220,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
                   </select>
                   <?php if ($op->guichet_id) : ?>
                     <a href="operateurs/<?= $op->username ?>-<?= $op->agent_real_id ?>?delete" class="p-1 text-error hover:bg-error/10 rounded">
-                      <span class="material-symbols-outlined text-sm">logout</span>
+                      <span class="material-symbols-outlined text-sm">delete</span>
                     </a>
                   <?php endif ?>
                 </div>

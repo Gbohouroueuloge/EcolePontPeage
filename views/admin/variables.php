@@ -2,17 +2,17 @@
 
 use App\Auth;
 use App\ConnectionBDD;
-use App\Models\Agent;
-use App\Models\Guichet;
+use App\Services\AdminService;
 
 $pdo = ConnectionBDD::getPdo();
-
 $auth = new Auth($pdo);
-
 $user = $auth->getUser();
 
-if (!Auth::isConnected() || !$auth->isAdmin()) {
+if (!Auth::isConnected() || !$auth->isAdmin() || !$user) {
   http_response_code(401);
-  header('Location: /404');
+  header('Location: /login');
   exit();
 }
+
+$adminService = new AdminService($pdo);
+$adminUnreadCount = $adminService->countUnreadNotifications();

@@ -7,7 +7,7 @@
     class="relative inline-flex group cursor-pointer">
     <div class="flex items-center justify-center w-14 h-14 rounded-full overflow-hidden border-2 border-surface-container-high <?= $type === "admin" ? "bg-primary group-hover:border-primary text-on-primary" : "bg-surface-container group-hover:border-surface-container text-primary" ?> shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:scale-105">
       <span class="uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110">
-        <?= substr($user->username, 0, 2) ?>
+        <?= substr($user->username ?? '', 0, 2) ?>
       </span>
     </div>
     <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full z-10"></span>
@@ -21,7 +21,7 @@
 
     <!-- Header -->
     <div class="px-5 py-3 mb-2 border-b border-slate-100">
-      <p class="font-bold text-slate-800 truncate"><?= $user->email ?></p>
+      <p class="font-bold text-slate-800 truncate"><?= $user->email ?? '' ?></p>
     </div>
 
     <div class="px-2 space-y-1">
