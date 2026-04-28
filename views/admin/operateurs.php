@@ -3,38 +3,47 @@
 use App\Models\Agent;
 use App\Models\Guichet;
 
+// Chargement des variables et de la connexion PDO
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
 
 $title = "Operators";
-
 $isOpen = false;
 
 /** @var PDO */
 $pdo = $pdo;
 
+/* ═══════════════════════════════════════════════════
+   TRAITEMENT DES ACTIONS (ASSIGNATION / REPOS)
+════════════════════════════════════════════════════ */
+
+// Assignation d'un agent à une voie (guichet)
 if (isset($_GET['voie'])) {
   $agentId = $params['operateur_id'];
   $voie    = (int) $_GET['voie'];
 
-  $delete = $pdo->prepare("DELETE FROM agent_guichet WHERE agent_id = ?");
-  $delete->execute([$agentId]);
-
-  $insert = $pdo->prepare("INSERT INTO agent_guichet (agent_id, guichet_id) VALUES (?, ?)");
-  $insert->execute([$agentId, $voie]);
+  // Mise à jour directe de la table 'agent' selon le schéma pont_peage2
+  $stmt = $pdo->prepare("UPDATE agent SET guichet_id = ?, date_assignation = NOW(), debut = NOW() WHERE id = ?");
+  $stmt->execute([$voie, $agentId]);
 
   header("Location: /admin/operateurs");
   exit;
 }
 
+// Mise au repos de l'agent (suppression de l'assignation)
 if (isset($_GET['delete'])) {
   $agentId = $params['operateur_id'];
 
-  $delete = $pdo->prepare("DELETE FROM agent_guichet WHERE agent_id = ?");
-  $delete->execute([$agentId]);
+  // On passe le guichet_id à NULL pour libérer l'agent
+  $stmt = $pdo->prepare("UPDATE agent SET guichet_id = NULL, date_assignation = NULL, debut = NULL WHERE id = ?");
+  $stmt->execute([$agentId]);
 
   header("Location: /admin/operateurs");
   exit;
 }
+
+/* ═══════════════════════════════════════════════════
+  FILTRES ET STATISTIQUES
+════════════════════════════════════════════════════ */
 
 $where = "";
 $isActive = 'tous';
@@ -49,52 +58,36 @@ if (!empty($_GET['filtre'])) {
       $where = "WHERE a.guichet_id IS NULL";
       $isActive = 'repos';
       break;
-    default:
-      $where = "";
-      $isActive = 'tous';
-      break;
   }
 }
 
+// Nombre total de passages (table paiement)
 $query = $pdo->prepare("SELECT COUNT(id) FROM paiement");
-$query->execute([]);
+$query->execute();
 $Nbrpayment = $query->fetchColumn();
 
-$query = $pdo->prepare("
-    SELECT 
-        a.id AS agent_real_id, 
-        a.*, 
-        u.username, 
-        g.id AS guichet_real_id, 
-        g.emplacement 
+// Récupération de tous les agents pour les compteurs
+$queryAll = $pdo->query("
+    SELECT a.*, u.username, g.emplacement 
     FROM agent a 
     JOIN users u ON a.user_id = u.id 
     LEFT JOIN guichet g ON a.guichet_id = g.id
 ");
+$agentsAll = $queryAll->fetchAll(PDO::FETCH_CLASS, Agent::class);
+$agentsActive = array_filter($agentsAll, fn($a) => $a->guichet_id !== null);
 
-$query->execute();
-$agentsAll = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+// Liste des guichets pour le menu déroulant
+$queryG = $pdo->query("SELECT * FROM guichet ORDER BY id ASC");
+$guichets = $queryG->fetchAll(PDO::FETCH_CLASS, Guichet::class);
 
-$agentsActive = array_filter($agentsAll, fn($a) => $a->is_en_cours());
-
-
-$query = $pdo->prepare("SELECT * FROM guichet ORDER BY created_at ASC");
-$query->execute();
-/** @var Guichet[] */
-$guichets = $query->fetchAll(PDO::FETCH_CLASS, Guichet::class);
-
-$filtre = [
-  'tous' => 'Tous',
-  'service' => 'Service',
-  'repos' => 'Repos'
-];
-
+/* ═══════════════════════════════════════════════════
+   PAGINATION ET LISTE DES OPÉRATEURS
+════════════════════════════════════════════════════ */
 
 $perPage = 8;
-$currentPage = (int)($_GET['page'] ?? 1);
-if ($currentPage <= 0) $currentPage = 1;
+$currentPage = max(1, (int)($_GET['page'] ?? 1));
 
-$countQuery = $pdo->query("SELECT COUNT(id) FROM agent");
+$countQuery = $pdo->query("SELECT COUNT(id) FROM agent as a {$where}");
 $total = (int)$countQuery->fetchColumn();
 $pages = ceil($total / $perPage);
 $offset = ($currentPage - 1) * $perPage;
@@ -111,7 +104,7 @@ $query = $pdo->prepare("
     JOIN users u ON a.user_id = u.id 
     LEFT JOIN guichet g ON a.guichet_id = g.id
     {$where}
-    ORDER BY created_at DESC 
+    ORDER BY a.created_at DESC 
     LIMIT :limit OFFSET :offset
 ");
 $query->bindValue('limit', $perPage, PDO::PARAM_INT);
@@ -119,6 +112,8 @@ $query->bindValue('offset', $offset, PDO::PARAM_INT);
 $query->execute();
 
 $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
+
+$filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos'];
 ?>
 
 <main class="md:ml-72 pt-20 px-8 pb-12 relative">
@@ -133,12 +128,6 @@ $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
           Gestion des Opérateurs
         </h2>
       </div>
-      <a
-        href="?new"
-        class="bg-primary text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 gold-glow hover:bg-secondary transition-all">
-        <span class="material-symbols-outlined text-sm">add</span>
-        Ajouter un agent
-      </a>
     </div>
 
     <!-- Compact Stats Row (Bento Style) -->
@@ -164,12 +153,10 @@ $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
     </div>
 
     <!-- Main Data Grid -->
-    <div class="bg-surface-container-lowest rounded-xl monolith-shadow overflow-hidden">
-      <div class="flex bg-surface-container-low p-1 rounded-lg">
-        <?php foreach ($filtre as $key => $value) : ?>
-          <a
-            href="?filtre=<?= $key ?>"
-            class="px-4 py-2 text-xs font-bold <?= !empty($_GET['filtre']) && $_GET['filtre'] == $key ? 'bg-primary text-white' : 'text-slate-500 hover:text-primary' ?> shadow-sm rounded-md text-primary">
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+      <div class="flex bg-surface-container-low p-1 mb-4 rounded-lg w-fit">
+        <?php foreach ($filtres_labels as $key => $value) : ?>
+          <a href="?filtre=<?= $key ?>" class="px-4 py-2 text-xs font-bold rounded-md <?= $isActive == $key ? 'bg-primary text-white' : 'text-slate-500 hover:text-primary' ?>">
             <?= $value ?>
           </a>
         <?php endforeach ?>
@@ -181,85 +168,55 @@ $operateurs = $query->fetchAll(PDO::FETCH_CLASS, Agent::class);
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Agent Details</th>
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Status</th>
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Voie Assignée</th>
-            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Passages
-              Mensuels</th>
-            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Dernière Garde
-            </th>
+            <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Début Service</th>
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-surface-container-low">
-          <?php foreach ($operateurs as $agent) : ?>
-            <tr class="hover:bg-surface-container-low/30 transition-colors group cursor-pointer">
+          <?php foreach ($operateurs as $op) : ?>
+            <tr class="hover:bg-surface-container-low/30 transition-colors">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
-                  <div
-                    class="inline-flex items-center justify-center border-2 border-surface-container-high  overflow-hidden h-10 w-10 rounded-full ring-2 bg-surface-container-high ring-white group">
-                    <span class="text-primary uppercase text-2xl font-black font-mono transition-transform duration-300 group-hover:scale-110" data-icon="person">
-                      <?= substr($agent->username, 0, 2) ?>
-                    </span>
+                  <div class="h-10 w-10 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-primary">
+                    <?= strtoupper(substr($op->username, 0, 2)) ?>
                   </div>
                   <div>
-                    <div class="font-bold text-primary text-sm uppercase"><?= $agent->username ?></div>
-                    <div class="font-mono text-[10px] text-slate-400">ID-PRT-<?= $agent->id ?></div>
+                    <div class="font-bold text-primary text-sm uppercase"><?= htmlspecialchars($op->username) ?></div>
+                    <div class="font-mono text-[10px] text-slate-400">ID-AGENT-<?= $op->agent_real_id ?></div>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <?php if ($agent->is_en_cours()) : ?>
-                  <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 diamond-indicator bg-emerald-500 animate-pulse"></div>
-                    <span class="text-[11px] font-bold text-emerald-700 uppercase">En Service</span>
-                  </div>
+                <?php if ($op->guichet_id) : ?>
+                  <span class="flex items-center gap-2 text-[10px] font-bold text-emerald-700 uppercase">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> En Service
+                  </span>
                 <?php else : ?>
-                  <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 diamond-indicator bg-slate-300"></div>
-                    <span class="text-[11px] font-bold text-slate-500 uppercase">Repos</span>
-                  </div>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">En Repos</span>
                 <?php endif ?>
               </td>
               <td class="px-6 py-4">
-                <?php if ($agent->is_en_cours()) : ?>
-                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
-                    <?= $agent->slug ?>
-                  </span>
-                <?php else : ?>
-                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
-                <?php endif ?>
+                <span class="px-2 py-1 rounded text-[10px] font-mono <?= $op->guichet_id ? 'bg-primary text-white' : 'bg-slate-100 text-slate-400' ?>">
+                  <?= $op->emplacement ?? '—' ?>
+                </span>
               </td>
-              <td class="px-6 py-4 text-right">
-                <span class="font-mono text-sm font-bold text-primary">0</span>
+              <td class="px-6 py-4 text-xs text-slate-500 font-mono">
+                <?= $op->debut ? date('d/m H:i', strtotime($op->debut)) : '—' ?>
               </td>
-              <td class="px-6 py-4 text-xs text-slate-500">
-                <?php if ($agent->getDateDebut()) : ?>
-                  <span class="bg-primary-container uppercase text-white px-2 py-1 rounded text-[10px] font-mono tracking-tighter">
-                    <?= $agent->getDateDebut()->format('d/m/Y H:i') ?>
-                  </span>
-                <?php else : ?>
-                  <span class="bg-surface-container-high text-primary px-2 py-1 rounded text-[10px] font-mono tracking-tighter">—</span>
-                <?php endif ?>
-              </td>
-              <td class="px-6 py-4 text-right">
+              <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <select
-                    name="voie"
-                    onchange="window.location.href = '/admin/operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?voie=' + this.value"
-                    id="voie"
-                    class="w-full text-xs bg-white rounded-lg border border-surface-variant px-2 py-1 text-primary font-semibold shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer">
-                    <option value="" disabled <?= $agent->guichet_real_id === null ? 'selected' : '' ?>>Choisir une voie...</option>
-                    <?php foreach ($guichets as $guichet) : ?>
-                      <option value="<?= $guichet->id ?>" <?= $agent->guichet_real_id == $guichet->id ? 'selected' : '' ?>>
-                        Voie <?= $guichet->id ?> - <?= $guichet->emplacement ?>
+                  <select onchange="window.location.href = 'operateurs/<?= $op->username ?>-<?= $op->agent_real_id ?>?voie=' + this.value"
+                    class="text-xs border rounded px-2 py-1 focus:ring-2 focus:ring-primary">
+                    <option value="" disabled <?= !$op->guichet_id ? 'selected' : '' ?>>Assigner...</option>
+                    <?php foreach ($guichets as $g) : ?>
+                      <option value="<?= $g->id ?>" <?= $op->guichet_id == $g->id ? 'selected' : '' ?>>
+                        Voie <?= $g->id ?> - <?= $g->emplacement ?>
                       </option>
                     <?php endforeach ?>
                   </select>
-
-                  <?php if ($agent->guichet_real_id !== null) : ?>
-                    <a
-                      href="operateurs/<?= $agent->username ?>-<?= $agent->agent_real_id ?>?delete"
-                      class="p-0.5 bg-error-container text-error rounded border border-surface-variant hover:bg-error/35 cursor-pointer">
-                      <span class="material-symbols-outlined text-xs">delete</span>
+                  <?php if ($op->guichet_id) : ?>
+                    <a href="operateurs/<?= $op->username ?>-<?= $op->agent_real_id ?>?delete" class="p-1 text-error hover:bg-error/10 rounded">
+                      <span class="material-symbols-outlined text-sm">logout</span>
                     </a>
                   <?php endif ?>
                 </div>

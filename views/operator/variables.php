@@ -22,10 +22,10 @@ if (!$agent) {
 }
 
 $query = $pdo->prepare(
-  "SELECT g.*, ag.date_assignation 
-  FROM agent_guichet ag
-  JOIN guichet g ON ag.guichet_id = g.id
-  WHERE ag.agent_id = :id"
+  "SELECT g.*, a.date_assignation 
+  FROM agent as a
+  JOIN guichet g ON a.guichet_id = g.id
+  WHERE a.id = :id"
 );
 $query->execute(['id' => $agent->id]);
 $guichet = $query->fetchObject(Guichet::class);

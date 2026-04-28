@@ -31,6 +31,7 @@ $routerAdmin
   ->get('/admin/operateurs/[*:operateur_username]-[i:operateur_id]', 'admin/operateurs', 'admin.operateurs.details')
   ->get('/admin/rapports', 'admin/rapports', 'admin.rapports')
   ->get('/admin/parametres', 'admin/parametres', 'admin.parametres')
+  ->post('/admin/parametres', 'admin/parametres', 'admin.parametres.post')
   ->run('adminLayout');
 
 $routerOperator = new App\Router(dirname(__DIR__) . '/views');
@@ -40,6 +41,7 @@ $routerOperator
   ->post('/operator', 'operator/index', 'operator.index.post')
   ->get('/operator/caisse', 'operator/caisse', 'operator.caisse')
   ->get('/operator/incident', 'operator/incident', 'operator.incident')
+  ->post('/operator/incident', 'operator/incident', 'operator.incident.post')
   ->get('/operator/mon-dashboard', 'operator/shift', 'operator.shift')
   ->run('operatorLayout');
 

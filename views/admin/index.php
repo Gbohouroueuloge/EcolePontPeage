@@ -24,10 +24,14 @@ foreach ($paymentsAll as $payment) {
   $revenue += $payment->montant;
 }
 
-$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 9");
+$query = $pdo->prepare("SELECT p.*, g.id AS guichet_id, g.emplacement, v.immatriculation FROM paiement p JOIN guichet g ON p.guichet_id = g.id JOIN vehicule v ON p.vehicule_id = v.id ORDER BY p.created_at DESC LIMIT 10");
 $query->execute([]);
 $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
 
+$query = $pdo->prepare("SELECT COUNT(id) FROM incident");
+
+$query->execute([]);
+$incidents = $query->fetchColumn();
 
 ?>
 
@@ -46,7 +50,7 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
   </div>
 
   <!-- KPI Row -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <!-- Revenue Card -->
     <div
       class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,7,25,0.03)] border-l-4 border-secondary relative overflow-hidden">
@@ -119,19 +123,17 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
     </div>
 
     <!-- Incidents Card -->
-    <!-- <div
+    <div
       class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,7,25,0.03)] border-l-4 border-error">
       <div class="flex justify-between items-start mb-4">
         <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant">Incidents
           actifs</span>
         <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
       </div>
-      <div class="font-mono text-4xl font-bold text-error mb-4">03</div>
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
-        <span class="text-xs font-bold text-on-surface uppercase tracking-tight">Intervention en cours</span>
+      <div class="font-mono text-4xl font-bold text-error mb-4">
+        <?= $incidents ?>
       </div>
-    </div> -->
+    </div>
   </div>
 
   <!-- Middle Section: Charts & Activity -->
@@ -275,16 +277,17 @@ $activities = $query->fetchAll(PDO::FETCH_CLASS, Paiement::class);
         <span class="text-[10px] font-bold bg-primary text-white px-2 py-1 rounded">DIRECT</span>
       </div>
 
-      <div class="space-y-6 relative before:content-[''] before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
+      <div class="space-y-6 mb-8 relative before:content-[''] before:absolute before:left-2.75 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant/30">
         <?php foreach ($activities as $activity): ?>
           <?php require 'components/cards/cardActivity.php'; ?>
         <?php endforeach; ?>
       </div>
 
-      <button
-        class="w-full mt-8 py-3 border border-outline-variant/30 rounded-lg text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all">
+      <a
+        href="/admin/historiques"
+        class="w-full mx-auto p-3 border border-outline-variant/30 rounded-lg text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all">
         Historique Complet
-      </button>
+      </a>
     </div>
   </div>
 </main>

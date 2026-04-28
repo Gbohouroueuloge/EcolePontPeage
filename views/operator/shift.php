@@ -58,7 +58,12 @@ foreach ($passages as $passage) {
   $montant += $passage->montant;
 }
 
-// dd($montant);
+$query = $pdo->prepare("SELECT COUNT(id) FROM incident");
+
+$query->execute([]);
+$incidents = $query->fetchColumn();
+
+// dd($incidents);
 ?>
 
 <main class="pt-24 px-4 md:px-8 mb-24 max-w-7xl mx-auto">
@@ -91,7 +96,7 @@ foreach ($passages as $passage) {
   </section>
 
   <!-- KPI Cards Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
     <!-- Passages Card -->
     <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
@@ -117,14 +122,16 @@ foreach ($passages as $passage) {
     </div>
 
     <!-- Incidents Card -->
-    <!-- <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
+    <div class="bg-surface-container-lowest p-6 rounded-xl ghost-border flex flex-col gap-2">
       <div class="flex justify-between items-start">
         <span
           class="text-sm font-semibold text-on-surface-variant font-headline uppercase tracking-wider">Incidents</span>
         <span class="material-symbols-outlined text-error">report_problem</span>
       </div>
-      <div class="mono-data text-4xl font-bold text-error">03</div>
-    </div> -->
+      <div class="mono-data text-4xl font-bold text-error">
+        <?= $incidents ?>
+      </div>
+    </div>
   </div>
 
   <!-- Two Column Layout: Table & Profile -->

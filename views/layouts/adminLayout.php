@@ -9,10 +9,11 @@ $navLinks = [
   ['text' => "Historiques", 'icon' => 'history', 'link' => "/historiques", 'isTitle' => false],
   ['text' => "Gestion", 'isTitle' => true],
   ['text' => "Tarifs", 'icon' => 'local_atm', 'link' => "/tarifs", 'isTitle' => false],
+  ['text' => "Messages", 'icon' => 'message', 'link' => "/messages", 'isTitle' => false],
   // ['text' => "Abonnés", 'icon' => 'group', 'link' => "/abonnes", 'isTitle' => false],
   ['text' => "Système", 'isTitle' => true],
   ['text' => "Operators", 'icon' => 'engineering', 'link' => "/operateurs", 'isTitle' => false],
-  ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
+  // ['text' => "Rapports", 'icon' => 'analytics', 'link' => "/rapports", 'isTitle' => false],
   ['text' => "Paramètres", 'icon' => 'settings', 'link' => "/parametres", 'isTitle' => false],
 ];
 ?>
