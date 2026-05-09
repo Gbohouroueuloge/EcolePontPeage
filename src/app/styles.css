@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/outfit-v15-latin-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/outfit-v15-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/fonts/outfit-v15-latin-900.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/dm-sans-v17-latin-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/dm-sans-v17-latin-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/dm-sans-v17-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-v20-latin-regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-v20-latin-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/inter-v20-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-v24-latin-700.woff2") format("woff2");
+}
+
+:root {
+  --background: 40 72% 97%;
+  --foreground: 45 13% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 45 13% 10%;
+  --primary: 223 100% 5%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 39 98% 64%;
+  --secondary-foreground: 38 100% 22%;
+  --muted: 36 28% 92%;
+  --muted-foreground: 220 6% 34%;
+  --accent: 219 65% 14%;
+  --accent-foreground: 0 0% 100%;
+  --border: 36 18% 84%;
+  --input: 37 31% 95%;
+  --ring: 39 98% 64%;
+  --success: 145 40% 30%;
+  --warning: 34 100% 46%;
+  --danger: 0 75% 42%;
+  --ink: 45 13% 10%;
+  --sky: 232 41% 39%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "DM Sans", "Public Sans", "Segoe UI", sans-serif;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(circle at top left, rgba(254, 190, 73, 0.14), transparent 24%),
+    radial-gradient(circle at top right, rgba(13, 31, 60, 0.08), transparent 22%),
+    linear-gradient(180deg, #fffdf8 0%, #fef9f1 48%, #f7f0e5 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-headline tracking-tight text-ink;
+  }
+
+  p {
+    @apply text-sm text-muted-foreground;
+  }
+
+  ::selection {
+    background: rgba(254, 190, 73, 0.32);
+    color: #1d1c17;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply rounded-2xl border border-[#e7e2da] bg-white/90 shadow-[0_18px_50px_rgba(0,7,25,0.08)];
+  }
+
+  .hero-mesh {
+    background:
+      radial-gradient(circle at 20% 15%, rgba(254, 190, 73, 0.18), transparent 22%),
+      linear-gradient(135deg, rgba(0, 7, 25, 0.98), rgba(13, 31, 60, 0.95));
+  }
+
+  .road-silhouette {
+    background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.14) 1.3px, transparent 0);
+    background-size: 40px 40px;
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px rgba(201, 144, 26, 0.22);
+  }
+
+  .section-kicker {
+    @apply font-mono text-[11px] font-bold uppercase tracking-[0.34em] text-secondary;
+  }
+
+  .status-dot {
+    @apply inline-flex h-2.5 w-2.5 rounded-full;
+  }
+
+  .app-content-grid {
+    @apply grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_360px];
+  }
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(13, 31, 60, 0.22);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
