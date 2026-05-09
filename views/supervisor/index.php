@@ -4,9 +4,11 @@ $title = 'Dashboard Superviseur';
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'supervisor/variables.php';
 
+$days = 7;
+
 $period = $analyticsService->resolvePeriod('30j');
 $overview = $analyticsService->getOverview($period['start'], $period['end'], $supervisedGuichetIds);
-$dailyTraffic = $analyticsService->getDailyTrafficSeries(7, $supervisedGuichetIds);
+$dailyTraffic = $analyticsService->getDailyTrafficSeries($days, $supervisedGuichetIds);
 $recentActivity = $analyticsService->getRecentActivity(8, $supervisedGuichetIds);
 $revenueByGuichet = $analyticsService->getRevenueByGuichet($period['start'], $period['end'], $supervisedGuichetIds);
 $dailyMax = 1;
@@ -59,7 +61,8 @@ foreach ($dailyTraffic as $point) {
       </div>
 
       <div class="grid grid-cols-7 gap-3">
-        <?php foreach ($dailyTraffic as $point) : ?>
+        <?php foreach ($dailyTraffic as $i => $point) : ?>
+            <?php if ($i >= $days) break ?>
           <?php $height = max(18, (int) round(($point['passages'] / $dailyMax) * 180)); ?>
           <div class="flex flex-col items-center gap-3">
             <span class="font-mono text-[10px] text-on-surface-variant"><?= $point['passages'] ?></span>

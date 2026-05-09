@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 28 avr. 2026 à 21:04
+-- Généré le : lun. 04 mai 2026 à 15:42
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -20,6 +20,31 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `pont_peage2`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `admin_notifications`
+--
+
+CREATE TABLE `admin_notifications` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `category` varchar(80) NOT NULL,
+  `title` varchar(180) NOT NULL,
+  `message` text NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `admin_notifications`
+--
+
+INSERT INTO `admin_notifications` (`id`, `category`, `title`, `message`, `user_id`, `is_read`, `created_at`, `updated_at`) VALUES
+(1, 'operator_waiting', 'Operateur en attente d affectation', 'Alex (alex@gmail.com) a essaye de se connecter sans guichet assigne. Merci de l affecter a une voie.', 2, 1, '2026-04-28 20:03:53.168', '2026-04-28 20:19:55.332'),
+(2, 'operator_waiting', 'Operateur en attente d affectation', 'user (user@gmail.com) a essaye de se connecter sans guichet assigne. Merci de l affecter a une voie.', 7, 1, '2026-04-29 08:15:03.938', '2026-04-29 08:15:23.004');
 
 -- --------------------------------------------------------
 
@@ -43,7 +68,8 @@ CREATE TABLE `agent` (
 --
 
 INSERT INTO `agent` (`id`, `user_id`, `guichet_id`, `debut`, `fin`, `date_assignation`, `created_at`, `updated_at`) VALUES
-(1, 2, 1, '2026-04-28 19:02:32', NULL, '2026-04-26 19:16:05', '2026-04-25 01:30:18.500', '2026-04-28 19:02:32.322');
+(1, 2, 1, '2026-05-04 08:57:40', '2026-05-04 08:57:44', '2026-05-02 21:14:04', '2026-04-25 01:30:18.500', '2026-05-04 08:57:44.187'),
+(17, 7, NULL, NULL, NULL, NULL, '2026-04-29 08:14:26.290', '2026-05-02 21:09:32.985');
 
 -- --------------------------------------------------------
 
@@ -66,7 +92,7 @@ CREATE TABLE `guichet` (
 
 INSERT INTO `guichet` (`id`, `slug`, `emplacement`, `is_active`, `created_at`, `updated_at`) VALUES
 (1, 'voie_01_nord', 'Nord', 1, '2026-04-25 01:30:18.478', '2026-04-26 19:44:07.849'),
-(2, 'voie_02_sud', 'Sud', 1, '2026-04-25 01:30:18.483', '2026-04-25 21:46:24.529'),
+(2, 'voie_02_sud', 'Sud', 1, '2026-04-25 01:30:18.483', '2026-04-28 21:11:02.359'),
 (3, 'voie_03_ouest', 'Ouest', 1, '2026-04-25 01:30:18.485', '2026-04-26 18:53:10.382'),
 (4, 'voie_04_est', 'Est', 1, '2026-04-25 01:30:18.490', '2026-04-25 21:46:24.545'),
 (5, 'voie_05_nord_est', 'Nord-Est', 1, '2026-04-25 01:30:18.492', '2026-04-26 18:50:27.295'),
@@ -97,7 +123,8 @@ CREATE TABLE `incident` (
 
 INSERT INTO `incident` (`id`, `vehicule_id`, `guichet_id`, `type`, `description`, `url_image`, `created_at`, `updated_at`) VALUES
 (1, 25, 1, 'Panne', 'Il y\'a une voiture en panne', '/uploads/incidents/incident_69ee68224643a.png', '2026-04-26 19:31:46.291', '2026-04-26 19:31:46.291'),
-(2, 7, 1, 'Urgence', NULL, '/uploads/incidents/incident_69ef6bad597a1.jpeg', '2026-04-27 13:59:09.368', '2026-04-27 13:59:09.368');
+(2, 7, 1, 'Urgence', NULL, '/uploads/incidents/incident_69ef6bad597a1.jpeg', '2026-04-27 13:59:09.368', '2026-04-27 13:59:09.368'),
+(3, 26, 1, 'Panne', 'Une voiture en panne', '/uploads/incidents/incident_69f85ebb031f9.jpg', '2026-05-04 08:54:19.017', '2026-05-04 08:54:19.017');
 
 -- --------------------------------------------------------
 
@@ -155,7 +182,78 @@ INSERT INTO `paiement` (`id`, `vehicule_id`, `guichet_id`, `mode_paiement`, `mon
 (32, 9, 7, 'Carte', 1843.00, 1, '2026-04-25 01:30:18.620', '2026-04-25 01:30:18.620'),
 (33, 8, 4, 'Espece', 5144.00, 1, '2026-04-25 01:30:18.622', '2026-04-25 01:30:18.622'),
 (34, 17, 3, 'Carte', 2273.00, 1, '2026-04-25 01:30:18.624', '2026-04-25 01:30:18.624'),
-(35, 14, 7, 'Carte', 1558.00, 1, '2026-04-25 01:30:18.625', '2026-04-25 01:30:18.625');
+(35, 14, 7, 'Carte', 1558.00, 1, '2026-04-25 01:30:18.625', '2026-04-25 01:30:18.625'),
+(36, 26, 1, 'Mobile Money', 500.00, 1, '2026-05-04 08:48:46.169', '2026-05-04 08:48:46.169');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `superviseur`
+--
+
+CREATE TABLE `superviseur` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `zone_nominale` varchar(120) DEFAULT NULL,
+  `telephone` varchar(50) DEFAULT NULL,
+  `created_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `superviseur`
+--
+
+INSERT INTO `superviseur` (`id`, `user_id`, `zone_nominale`, `telephone`, `created_at`, `updated_at`) VALUES
+(1, 6, 'Zone nord', '+225 27 21 00 00 00', '2026-04-28 20:07:34.680', '2026-04-28 20:07:34.680');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `superviseur_guichet`
+--
+
+CREATE TABLE `superviseur_guichet` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `superviseur_id` int(10) UNSIGNED NOT NULL,
+  `guichet_id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `superviseur_guichet`
+--
+
+INSERT INTO `superviseur_guichet` (`id`, `superviseur_id`, `guichet_id`, `created_at`) VALUES
+(1, 1, 1, '2026-04-28 20:07:34.685');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `system_settings`
+--
+
+CREATE TABLE `system_settings` (
+  `setting_key` varchar(100) NOT NULL,
+  `setting_value` text NOT NULL,
+  `updated_by` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `system_settings`
+--
+
+INSERT INTO `system_settings` (`setting_key`, `setting_value`, `updated_by`, `created_at`, `updated_at`) VALUES
+('bridge_code', 'PPA-01', NULL, '2026-04-28 19:25:52.543', '2026-04-28 19:25:52.543'),
+('bridge_name', 'Pont a Peage Atlantique', NULL, '2026-04-28 19:25:52.540', '2026-04-28 19:25:52.540'),
+('currency', 'FCFA (XOF)', NULL, '2026-04-28 19:25:52.550', '2026-04-28 19:25:52.550'),
+('dashboard_refresh_seconds', '30', NULL, '2026-04-28 19:25:52.560', '2026-04-28 19:25:52.560'),
+('support_email', 'support@peage.local', NULL, '2026-04-28 19:25:52.553', '2026-04-28 19:25:52.553'),
+('support_phone', '+225 01 23 45 67 89', NULL, '2026-04-28 19:25:52.556', '2026-04-28 19:25:52.556'),
+('timezone', 'UTC', NULL, '2026-04-28 19:25:52.558', '2026-04-28 19:25:52.558'),
+('waiting_message', 'Votre compte a bien ete cree. Un administrateur doit encore vous affecter a un guichet avant votre premiere vacation.', NULL, '2026-04-28 19:25:52.566', '2026-04-28 19:25:52.566');
 
 -- --------------------------------------------------------
 
@@ -193,7 +291,7 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` text NOT NULL,
-  `role` enum('operateur','admin') NOT NULL DEFAULT 'operateur',
+  `role` enum('operateur','admin','superviseur') NOT NULL DEFAULT 'operateur',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `last_login_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
   `created_at` timestamp(3) NOT NULL DEFAULT current_timestamp(3),
@@ -205,8 +303,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `is_active`, `last_login_at`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@peage.com', '$2y$10$LMFl/NAeo9hVBtbbP8hylemNBA9aOY.zVR6jmBqDyJJCSjzcZR1Wy', 'admin', 1, '2026-04-25 01:30:18.474', '2026-04-25 01:30:18.474', '2026-04-25 01:30:18.474'),
-(2, 'Alex', 'alex@gmail.com', '$2y$10$QRipLOqT2HedsSULpQ22IOJsrytqrFbTlLOnQl6Qy1OBuSWiP5CUC', 'operateur', 1, '2026-04-25 01:30:18.476', '2026-04-25 01:30:18.476', '2026-04-25 01:30:18.476');
+(1, 'admin', 'admin@peage.com', '$2y$10$LMFl/NAeo9hVBtbbP8hylemNBA9aOY.zVR6jmBqDyJJCSjzcZR1Wy', 'admin', 1, '2026-05-04 13:30:36.960', '2026-04-25 01:30:18.474', '2026-05-04 13:30:36.960'),
+(2, 'Alex', 'alex@gmail.com', '$2y$10$QRipLOqT2HedsSULpQ22IOJsrytqrFbTlLOnQl6Qy1OBuSWiP5CUC', 'operateur', 1, '2026-04-29 08:02:32.443', '2026-04-25 01:30:18.476', '2026-04-29 08:02:32.443'),
+(6, 'Marc', 'marc@gmail.com', '$2y$10$bT7U7Ch.lLKQo0Gk.xR8hOx0m9FO4s3hdIHGcZNZYeqoKt1s1d0N6', 'superviseur', 1, '2026-04-29 08:02:47.334', '2026-04-28 20:07:34.679', '2026-04-29 08:02:47.334'),
+(7, 'user', 'user@gmail.com', '$2y$10$Wd5wf.06xsglWV8Bhf/ZXuQQ4GMj6vp0/a9bPrjumuk7cueoeNuy2', 'operateur', 1, '2026-04-29 08:15:03.930', '2026-04-29 08:14:26.288', '2026-04-29 08:15:03.930');
 
 -- --------------------------------------------------------
 
@@ -254,11 +354,20 @@ INSERT INTO `vehicule` (`id`, `immatriculation`, `type_vehicule_id`, `marque`, `
 (22, 'qw-177-ct', 5, 'Toussaint', 'S.A.R.L.', 'Vert printemps', '2026-04-25 01:30:18.548', '2026-04-25 01:30:18.548'),
 (23, 'ri-719-zs', 2, 'Martin', 'S.A.R.L.', 'Moutarde', '2026-04-25 01:30:18.551', '2026-04-25 01:30:18.551'),
 (24, 'wa-520-ba', 4, 'Boucher S.A.R.L.', 'SARL', 'Fuchsia', '2026-04-25 01:30:18.553', '2026-04-25 01:30:18.553'),
-(25, 'os-387-cl', 4, 'Jacquet Maurice S.A.', 'S.A.S.', 'Jaune d\'or', '2026-04-25 01:30:18.555', '2026-04-25 01:30:18.555');
+(25, 'os-387-cl', 4, 'Jacquet Maurice S.A.', 'S.A.S.', 'Jaune d\'or', '2026-04-25 01:30:18.555', '2026-04-25 01:30:18.555'),
+(26, 'CD-21-SA', 3, NULL, NULL, NULL, '2026-05-04 08:48:46.169', '2026-05-04 08:48:46.169');
 
 --
 -- Index pour les tables déchargées
 --
+
+--
+-- Index pour la table `admin_notifications`
+--
+ALTER TABLE `admin_notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_notifications_user` (`user_id`),
+  ADD KEY `idx_notifications_read` (`is_read`);
 
 --
 -- Index pour la table `agent`
@@ -291,6 +400,28 @@ ALTER TABLE `paiement`
   ADD KEY `fk_paiement_guichet` (`guichet_id`);
 
 --
+-- Index pour la table `superviseur`
+--
+ALTER TABLE `superviseur`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_superviseur_user` (`user_id`);
+
+--
+-- Index pour la table `superviseur_guichet`
+--
+ALTER TABLE `superviseur_guichet`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_superviseur_guichet` (`superviseur_id`,`guichet_id`),
+  ADD KEY `idx_superviseur_guichet_guichet` (`guichet_id`);
+
+--
+-- Index pour la table `system_settings`
+--
+ALTER TABLE `system_settings`
+  ADD PRIMARY KEY (`setting_key`),
+  ADD KEY `idx_settings_updated_by` (`updated_by`);
+
+--
 -- Index pour la table `typevehicule`
 --
 ALTER TABLE `typevehicule`
@@ -314,10 +445,16 @@ ALTER TABLE `vehicule`
 --
 
 --
+-- AUTO_INCREMENT pour la table `admin_notifications`
+--
+ALTER TABLE `admin_notifications`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT pour la table `agent`
 --
 ALTER TABLE `agent`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `guichet`
@@ -329,31 +466,43 @@ ALTER TABLE `guichet`
 -- AUTO_INCREMENT pour la table `incident`
 --
 ALTER TABLE `incident`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `paiement`
 --
 ALTER TABLE `paiement`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT pour la table `superviseur`
+--
+ALTER TABLE `superviseur`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT pour la table `superviseur_guichet`
+--
+ALTER TABLE `superviseur_guichet`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `typevehicule`
 --
 ALTER TABLE `typevehicule`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `vehicule`
 --
 ALTER TABLE `vehicule`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Contraintes pour les tables déchargées
@@ -379,6 +528,19 @@ ALTER TABLE `incident`
 ALTER TABLE `paiement`
   ADD CONSTRAINT `fk_paiement_guichet` FOREIGN KEY (`guichet_id`) REFERENCES `guichet` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_paiement_vehicule` FOREIGN KEY (`vehicule_id`) REFERENCES `vehicule` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `superviseur`
+--
+ALTER TABLE `superviseur`
+  ADD CONSTRAINT `fk_superviseur_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `superviseur_guichet`
+--
+ALTER TABLE `superviseur_guichet`
+  ADD CONSTRAINT `fk_superviseur_guichet_guichet` FOREIGN KEY (`guichet_id`) REFERENCES `guichet` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_superviseur_guichet_superviseur` FOREIGN KEY (`superviseur_id`) REFERENCES `superviseur` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `vehicule`

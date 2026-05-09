@@ -110,7 +110,7 @@ $baseUrl = '?' . http_build_query($queryParams);
       </div>
     </div>
 
-    <!-- Filters Sticky -->
+    <!-- Filters -->
     <div class="bg-surface/95 backdrop-blur-md py-8">
       <!-- Filter Bar -->
       <form action="" method="get" class="bg-surface-container-low p-4 rounded-xl flex flex-wrap items-center gap-6">
@@ -186,7 +186,7 @@ $baseUrl = '?' . http_build_query($queryParams);
       </form>
     </div>
 
-    <!-- Data Table Section -->
+    <!-- Data Table -->
     <div class="flex-1 pb-12">
       <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
         <table class="w-full hidden xl:table text-left border-collapse">
@@ -225,36 +225,29 @@ $baseUrl = '?' . http_build_query($queryParams);
           <!-- Pagination -->
           <?php if ($totalPages > 1) : ?>
             <div class="flex gap-1 items-center">
-
-              <!-- Première page -->
               <a href="<?= $baseUrl ?>&page=1"
                 class="w-8 h-8 flex items-center justify-center rounded <?= $page === 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
                 <span class="material-symbols-outlined text-sm">first_page</span>
               </a>
 
-              <!-- Précédent -->
               <a href="<?= $baseUrl ?>&page=<?= $page - 1 ?>"
                 class="w-8 h-8 flex items-center justify-center rounded <?= $page === 1 ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
                 <span class="material-symbols-outlined text-sm">chevron_left</span>
               </a>
 
-              <!-- Page courante -->
               <span class="px-3 h-8 flex items-center justify-center rounded bg-white text-primary border border-surface-container shadow-sm text-xs font-black">
                 <?= $page ?> / <?= $totalPages ?>
               </span>
 
-              <!-- Suivant -->
               <a href="<?= $baseUrl ?>&page=<?= $page + 1 ?>"
                 class="w-8 h-8 flex items-center justify-center rounded <?= $page === $totalPages ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
               </a>
 
-              <!-- Dernière page -->
               <a href="<?= $baseUrl ?>&page=<?= $totalPages ?>"
                 class="w-8 h-8 flex items-center justify-center rounded <?= $page === $totalPages ? 'opacity-30 pointer-events-none' : 'hover:bg-surface-container' ?> text-slate-500 border border-transparent transition-colors">
                 <span class="material-symbols-outlined text-sm">last_page</span>
               </a>
-
             </div>
           <?php endif ?>
 

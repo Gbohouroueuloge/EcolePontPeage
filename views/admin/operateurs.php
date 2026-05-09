@@ -2,6 +2,7 @@
 
 use App\Models\Agent;
 use App\Models\Guichet;
+use App\Services\AdminService;
 
 // Chargement des variables et de la connexion PDO
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'admin/variables.php';
@@ -16,7 +17,6 @@ $pdo = $pdo;
    TRAITEMENT DES ACTIONS (ASSIGNATION / REPOS)
 ════════════════════════════════════════════════════ */
 
-// Assignation d'un agent à une voie (guichet)
 if (isset($_GET['voie'])) {
   $agentId = $params['operateur_id'] ?? null;
   $voie    = (int) $_GET['voie'];
@@ -29,11 +29,9 @@ if (isset($_GET['voie'])) {
   exit;
 }
 
-// Mise au repos de l'agent (suppression de l'assignation)
 if (isset($_GET['delete'])) {
   $agentId = $params['operateur_id'] ?? null;
 
-  // On passe le guichet_id à NULL pour libérer l'agent
   $stmt = $pdo->prepare("UPDATE agent SET guichet_id = NULL, date_assignation = NULL, debut = NULL WHERE id = ?");
   $stmt->execute([$agentId]);
 
@@ -61,12 +59,10 @@ if (!empty($_GET['filtre'])) {
   }
 }
 
-// Nombre total de passages (table paiement)
 $query = $pdo->prepare("SELECT COUNT(id) FROM paiement");
 $query->execute();
 $Nbrpayment = $query->fetchColumn();
 
-// Récupération de tous les agents pour les compteurs
 $queryAll = $pdo->query("
     SELECT a.*, u.username, g.emplacement 
     FROM agent a 
@@ -76,12 +72,11 @@ $queryAll = $pdo->query("
 $agentsAll = $queryAll->fetchAll(PDO::FETCH_CLASS, Agent::class);
 $agentsActive = array_filter($agentsAll, fn($a) => $a->guichet_id !== null);
 
-// Liste des guichets pour le menu déroulant
 $queryG = $pdo->query("SELECT * FROM guichet ORDER BY id ASC");
 $guichets = $queryG->fetchAll(PDO::FETCH_CLASS, Guichet::class);
 
 /* ═══════════════════════════════════════════════════
-   PAGINATION ET LISTE DES OPÉRATEURS
+  PAGINATION ET LISTE DES OPÉRATEURS
 ════════════════════════════════════════════════════ */
 
 $perPage = 8;
@@ -118,7 +113,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
 
 <main class="md:ml-72 pt-20 px-8 pb-12 relative">
   <div>
-    <!-- Header Section with Editorial Typography -->
+    <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between items-center lg:items-end gap-2 mb-10">
       <div>
         <p class="text-secondary font-mono text-xs font-bold tracking-[0.3em] uppercase mb-2">
@@ -134,7 +129,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
       </a>
     </div>
 
-    <!-- Compact Stats Row (Bento Style) -->
+    <!-- Stats -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
       <div class="bg-surface-container-lowest p-6 rounded-xl monolith-shadow border-l-4 border-primary">
         <div class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total Staff</div>
@@ -156,7 +151,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
       </div>
     </div>
 
-    <!-- Main Data Grid -->
+    <!-- Main -->
     <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
       <div class="flex bg-surface-container-low p-1 mb-4 rounded-lg w-fit">
         <?php foreach ($filtres_labels as $key => $value) : ?>
@@ -176,6 +171,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
             <th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Actions</th>
           </tr>
         </thead>
+
         <tbody class="divide-y divide-surface-container-low">
           <?php foreach ($operateurs as $op) : ?>
             <tr class="hover:bg-surface-container-low/30 transition-colors">
@@ -209,6 +205,10 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
+                  <a href="?view=<?= $op->user_id ?>" class="p-1 text-primary hover:bg-primary/10 rounded">
+                    <span class="material-symbols-outlined text-sm">visibility</span>
+                  </a>
+
                   <select onchange="window.location.href = 'operateurs/<?= $op->username ?>-<?= $op->agent_real_id ?>?voie=' + this.value"
                     class="text-xs border rounded px-2 py-1 focus:ring-2 focus:ring-primary">
                     <option value="" disabled <?= !$op->guichet_id ? 'selected' : '' ?>>Assigner...</option>
@@ -218,6 +218,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
                       </option>
                     <?php endforeach ?>
                   </select>
+
                   <?php if ($op->guichet_id) : ?>
                     <a href="operateurs/<?= $op->username ?>-<?= $op->agent_real_id ?>?delete" class="p-1 text-error hover:bg-error/10 rounded">
                       <span class="material-symbols-outlined text-sm">delete</span>
@@ -233,8 +234,6 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
       <div class="w-full flex xl:hidden flex-col gap-4">
         <?php foreach ($operateurs as $agent) : ?>
           <div class="bg-white rounded-2xl border border-surface-variant shadow-sm overflow-hidden mb-3">
-
-            <!-- Header de la card -->
             <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low/40 border-b border-surface-variant">
               <div class="flex items-center gap-3">
                 <div class="inline-flex items-center justify-center border-2 border-surface-container-high overflow-hidden h-10 w-10 rounded-full bg-surface-container-high ring-2 ring-white">
@@ -248,7 +247,6 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
                 </div>
               </div>
 
-              <!-- Statut -->
               <?php if ($agent->is_en_cours()) : ?>
                 <div class="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                   <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -262,10 +260,7 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
               <?php endif ?>
             </div>
 
-            <!-- Infos -->
             <div class="px-4 py-3 space-y-2.5">
-
-              <!-- Voie assignée -->
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Voie</span>
                 <?php if ($agent->is_en_cours()) : ?>
@@ -277,13 +272,11 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
                 <?php endif ?>
               </div>
 
-              <!-- Transactions -->
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Transactions</span>
                 <span class="font-mono text-sm font-bold text-primary">0</span>
               </div>
 
-              <!-- Début de service -->
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Début</span>
                 <?php if ($agent->getDateDebut()) : ?>
@@ -296,7 +289,6 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
               </div>
             </div>
 
-            <!-- Actions -->
             <div class="px-4 py-3 border-t border-surface-variant bg-surface-container-low/20">
               <div class="flex items-center gap-2">
                 <select
@@ -345,111 +337,6 @@ $filtres_labels = ['tous' => 'Tous', 'service' => 'Service', 'repos' => 'Repos']
           <?php endif; ?>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Slide-in Side Panel (Agent Details) -->
-  <div
-    class="fixed <?= $isOpen ? 'flex' : 'hidden' ?> right-0 top-0 h-full w-110 bg-white z-60 shadow-2xl monolith-shadow flex-col translate-x-0 transition-transform duration-300 border-l border-surface-container">
-    <!-- Panel Header -->
-    <div class="px-8 py-10 border-b border-surface-container-low relative">
-      <button class="absolute top-8 right-8 text-slate-400 hover:text-primary">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-      <div class="flex items-start gap-6">
-        <div class="w-24 h-24 rounded-lg bg-surface-container border-2 border-secondary-container overflow-hidden p-1">
-          <img alt="Detail Agent Jean-Pierre" class="w-full h-full object-cover rounded"
-            data-alt="focused detailed portrait of a senior toll bridge operator"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqrlKH7p2trhedP0Fh2Hx59OkMv7ijI9MCS2tIX4kkIHrVlptZZyH1mgU7bwCt26o6s4peTTBde_TN6_q6OeXAqoP_KCia0OQFoJoWx8OhjpB97XRRn1jDZhwE1Yda6cDl8h5qFXdyxjsr3GNzvW4pt_MHmNxY-aM9ZbtW4bKRXRkrKO2vmeIaD_rUoKfQg0on8YnBF1nK3Z3vE8fTGPjZODRoVy7IHWerkdM8Y-tA2uTc2cblJf63W68IFu7bKVSlm16u00gaGNe9" />
-        </div>
-        <div class="mt-2">
-          <span class="text-[10px] font-mono bg-primary text-white px-2 py-0.5 rounded mb-2 inline-block">SENIOR
-            OFFICER</span>
-          <h3 class="font-['Outfit'] text-2xl font-bold tracking-tight text-primary">Jean-Pierre Dubois</h3>
-          <div class="flex items-center gap-2 mt-1">
-            <div class="w-1.5 h-1.5 diamond-indicator bg-emerald-500"></div>
-            <span class="text-xs font-bold text-emerald-700 uppercase tracking-tighter">Affectation Actuelle: Voie 4
-              Nord</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Panel Body -->
-    <div class="flex-1 overflow-y-auto p-8 space-y-10">
-      <!-- Key Metrics Grid -->
-      <div>
-        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-          <span class="w-4 h-px bg-slate-300"></span> Performances du mois
-        </h4>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-surface-container-low p-4 rounded-lg border-l-2 border-primary">
-            <div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Passages Validés</div>
-            <div class="font-mono text-xl font-bold text-primary">12,450</div>
-          </div>
-          <div class="bg-surface-container-low p-4 rounded-lg border-l-2 border-secondary">
-            <div class="text-[10px] text-slate-500 font-bold uppercase mb-1">Anomalies Signalées</div>
-            <div class="font-mono text-xl font-bold text-primary">02</div>
-          </div>
-        </div>
-      </div>
-      <!-- Recent Shifts List -->
-      <div>
-        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-          <span class="w-4 h-px bg-slate-300"></span> Historique des gardes
-        </h4>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between py-3 border-b border-surface-container-low">
-            <div>
-              <div class="text-sm font-bold text-primary">Matin (06:00 - 14:00)</div>
-              <div class="text-[10px] text-slate-400 uppercase font-mono">15 Octobre 2023 • LANE_04</div>
-            </div>
-            <div class="text-right">
-              <div class="font-mono text-sm font-bold text-primary">824 p.</div>
-              <div class="text-[9px] text-emerald-600 font-bold uppercase">Optimal</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between py-3 border-b border-surface-container-low">
-            <div>
-              <div class="text-sm font-bold text-primary">Nuit (22:00 - 06:00)</div>
-              <div class="text-[10px] text-slate-400 uppercase font-mono">14 Octobre 2023 • LANE_01</div>
-            </div>
-            <div class="text-right">
-              <div class="font-mono text-sm font-bold text-primary">410 p.</div>
-              <div class="text-[9px] text-emerald-600 font-bold uppercase">Optimal</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between py-3 border-b border-surface-container-low">
-            <div>
-              <div class="text-sm font-bold text-primary">Après-midi (14:00 - 22:00)</div>
-              <div class="text-[10px] text-slate-400 uppercase font-mono">13 Octobre 2023 • LANE_04</div>
-            </div>
-            <div class="text-right">
-              <div class="font-mono text-sm font-bold text-primary">912 p.</div>
-              <div class="text-[9px] text-emerald-600 font-bold uppercase">Optimal</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Additional Info -->
-      <div class="bg-primary p-6 rounded-xl text-white">
-        <div class="flex items-center gap-4 mb-4">
-          <span class="material-symbols-outlined text-secondary-container"
-            style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
-          <span class="text-xs font-bold uppercase tracking-widest">Note d'Assiduité</span>
-        </div>
-        <div class="font-['Outfit'] text-4xl font-bold mb-2">9.8<span class="text-lg opacity-50">/10</span></div>
-        <p class="text-[11px] text-slate-400 font-light leading-relaxed">Jean-Pierre est un agent exemplaire avec un
-          taux de présence de 100% sur les 90 derniers jours.</p>
-      </div>
-    </div>
-    <!-- Panel Footer -->
-    <div class="p-8 border-t border-surface-container-low bg-surface-container-lowest grid grid-cols-2 gap-4">
-      <button
-        class="px-6 py-3 border border-surface-variant rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors">Modifier
-        Profil</button>
-      <button
-        class="px-6 py-3 bg-secondary text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-primary transition-colors">Assigner
-        Garde</button>
     </div>
   </div>
 </main>

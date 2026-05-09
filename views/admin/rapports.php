@@ -73,16 +73,20 @@ if (!empty($_GET['export'])) {
 
 <main class="md:ml-64 px-6 pb-12 pt-24 md:px-8">
   <section class="mb-10 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-    <div>
-      <div class="text-[11px] font-bold uppercase tracking-[0.3em] text-secondary">Reporting</div>
-      <h1 class="mt-2 font-headline text-5xl font-black tracking-tight text-primary">Rapports administrateur</h1>
+    <div class="pb-4">
+      <div class="text-[11px] font-bold uppercase tracking-[0.3em] text-secondary flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">description</span> Centre de rapports
+      </div>
+      <h1 class="mt-2 font-headline header-accent text-5xl font-black tracking-tight text-primary">Rapports & Archives</h1>
       <p class="mt-3 max-w-3xl text-sm leading-7 text-on-surface-variant">
         Rapports analytiques sur les transactions et les incidents au cours du temps.
       </p>
     </div>
 
     <div class="flex flex-wrap gap-2">
-      <a class="rounded-2xl bg-primary px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white" href="<?= $baseExportUrl . ($queryArgs ? '&' : '?') ?>export=csv">Export CSV</a>
+      <a class="btn-micro group flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-lg shadow-primary/20" href="<?= $baseExportUrl . ($queryArgs ? '&' : '?') ?>export=csv">
+        Export CSV
+      </a>
       <a class="rounded-2xl border border-primary/15 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary" href="<?= $baseExportUrl . ($queryArgs ? '&' : '?') ?>export=json">Export JSON</a>
       <a class="rounded-2xl border border-primary/15 px-4 py-3 text-xs font-bold uppercase tracking-[0.2em] text-primary" href="<?= $baseExportUrl . ($queryArgs ? '&' : '?') ?>export=excel">Export Excel</a>
     </div>

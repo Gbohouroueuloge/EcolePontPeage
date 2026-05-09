@@ -197,8 +197,7 @@ class AdminService
     $stmt = $this->pdo->prepare("
       SELECT id
       FROM users
-      WHERE email = ?
-        AND (? IS NULL OR id <> ?)
+      WHERE email = ? AND (? IS NULL OR id <> ?)
       LIMIT 1
     ");
     $stmt->execute([$email, $id, $id]);

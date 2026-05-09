@@ -344,4 +344,273 @@
   .anim-fade-in-up {
     animation: fadeInUp 0.28s ease-out both;
   }
+
+  /* ── ENTRÉE DE PAGE ───────────────────────────────── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── BAR CHART ────────────────────────────────────── */
+  @keyframes barGrow {
+    from { height: 0 !important; }
+    to   { height: var(--bar-h); }
+  }
+  .bar-animate {
+    animation: barGrow 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* ── PROGRESS BAR ─────────────────────────────────── */
+  @keyframes progressFill {
+    from { width: 0%; }
+    to   { width: var(--progress-w); }
+  }
+  .progress-animate {
+    animation: progressFill 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+  }
+
+  /* ── ICÔNES ───────────────────────────────────────── */
+  @keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    40%      { transform: translateY(-5px); }
+    65%      { transform: translateY(-2px); }
+  }
+  @keyframes iconSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes iconPop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* ── NOTIFICATIONS ────────────────────────────────── */
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(254, 190, 73, 0); }
+    50%      { box-shadow: 0 0 0 6px rgba(254, 190, 73, 0.25); }
+  }
+  @keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+  }
+
+  /* ── SHIMMER LOADING ──────────────────────────────── */
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to   { background-position: 200% 0; }
+  }
+
+  /* ── RIPPLE ───────────────────────────────────────── */
+  @keyframes rippleEffect {
+    from { transform: scale(0); opacity: 0.4; }
+    to   { transform: scale(4); opacity: 0; }
+  }
+
+  /* ── STAT COUNT ───────────────────────────────────── */
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(12px) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ── CLASSES UTILITAIRES ──────────────────────────── */
+  .anim-fade-up      { animation: fadeInUp   0.5s ease-out both; }
+  .anim-fade-left    { animation: fadeInLeft 0.5s ease-out both; }
+  .anim-scale-in     { animation: scaleIn    0.4s ease-out both; }
+  .anim-slide-right  { animation: slideInRight 0.4s ease-out both; }
+  .anim-fade         { animation: fadeIn     0.4s ease-out both; }
+  .anim-count-up     { animation: countUp    0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+  /* Stagger delays */
+  .delay-0   { animation-delay: 0ms; }
+  .delay-50  { animation-delay: 50ms; }
+  .delay-100 { animation-delay: 100ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-250 { animation-delay: 250ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-350 { animation-delay: 350ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-600 { animation-delay: 600ms; }
+  .delay-700 { animation-delay: 700ms; }
+  .delay-800 { animation-delay: 800ms; }
+
+  /* ── CARD LIFT ────────────────────────────────────── */
+  .card-lift {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.25s ease;
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0, 7, 25, 0.10);
+  }
+
+  /* ── ICON HOVER EFFECTS ───────────────────────────── */
+  .icon-bounce:hover .material-symbols-outlined {
+    animation: iconBounce 0.5s ease;
+  }
+  .icon-pop:hover .material-symbols-outlined {
+    animation: iconPop 0.35s ease;
+  }
+  .icon-fill-hover .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    transition: font-variation-settings 0.2s ease;
+  }
+  .icon-fill-hover:hover .material-symbols-outlined,
+  .icon-fill-hover.active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  }
+
+  /* ── NAV LINK ─────────────────────────────────────── */
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+  .nav-link::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--color-secondary-container);
+    transform: scaleY(0);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 0 2px 2px 0;
+  }
+  .nav-link:hover::before {
+    transform: scaleY(0.6);
+  }
+  .nav-link.active::before {
+    transform: scaleY(1);
+  }
+  .nav-link .nav-icon {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                color 0.2s ease;
+  }
+  .nav-link:hover .nav-icon {
+    transform: translateX(2px);
+  }
+
+  /* ── BADGE NOTIFICATION ───────────────────────────── */
+  .badge-pulse {
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+  .pulse-glow {
+    animation: pulseGlow 2.5s ease-in-out infinite;
+  }
+
+  /* ── STAT ICON CONTAINER ──────────────────────────── */
+  .stat-icon {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease;
+  }
+  .card-lift:hover .stat-icon {
+    transform: scale(1.12) rotate(-5deg);
+    box-shadow: 0 8px 20px rgba(0,7,25,0.12);
+  }
+
+  /* ── BUTTON MICRO ─────────────────────────────────── */
+  .btn-micro {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.15s ease,
+                filter 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-micro:hover  { transform: translateY(-1px); filter: brightness(1.05); }
+  .btn-micro:active { transform: scale(0.97); }
+
+  /* Ripple children */
+  .btn-micro .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    pointer-events: none;
+    animation: rippleEffect 0.5s linear forwards;
+  }
+
+  /* ── SCROLL-REVEAL ────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ── HEADER GRADIENT BAR ──────────────────────────── */
+  .header-accent {
+    position: relative;
+  }
+  .header-accent::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-secondary-container), transparent);
+    animation: fadeIn 0.6s ease 0.3s both;
+  }
+
+  /* ── LIVE INDICATOR ───────────────────────────────── */
+  @keyframes livePing {
+    0%   { transform: scale(1); opacity: 0.8; }
+    70%  { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .live-dot {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .live-dot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: currentColor;
+    animation: livePing 1.8s ease-out infinite;
+  }
+
+  /* ── SIDEBAR LOGO GLOW ────────────────────────────── */
+  @keyframes logoGlow {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(254,190,73,0)); }
+    50%       { filter: drop-shadow(0 0 8px rgba(254,190,73,0.5)); }
+  }
+  .logo-glow {
+    animation: logoGlow 3s ease-in-out infinite;
+  }
+
+  /* ── PAGE TRANSITION ──────────────────────────────── */
+  .page-content {
+    animation: fadeInUp 0.4s ease-out both;
+  }
 }

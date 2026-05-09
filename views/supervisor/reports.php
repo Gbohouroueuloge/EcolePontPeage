@@ -60,7 +60,7 @@ if (!empty($_GET['export'])) {
       <div class="text-[11px] font-bold uppercase tracking-[0.3em] text-secondary">Reporting</div>
       <h1 class="mt-2 font-headline text-5xl font-black tracking-tight text-primary">Rapports superviseur</h1>
       <p class="mt-3 max-w-3xl text-sm leading-7 text-on-surface-variant">
-        Exportez les passages et incidents de votre perimetre pour partage terrain, point journalier et suivi de performance.
+        Rapports analytiques sur les transactions et les incidents au cours du temps.
       </p>
     </div>
 
@@ -102,7 +102,7 @@ if (!empty($_GET['export'])) {
           <div class="rounded-3xl bg-surface-container-low p-4">
             <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <div class="font-headline text-xl font-bold text-primary"><?= htmlspecialchars($row['immatriculation']) ?></div>
+                <div class="font-headline uppercase text-xl font-bold text-primary"><?= htmlspecialchars($row['immatriculation']) ?></div>
                 <div class="mt-2 text-sm text-on-surface-variant">
                   <?= htmlspecialchars($row['type_vehicule']) ?> - Voie <?= $row['guichet_id'] ?> <?= htmlspecialchars($row['guichet']) ?>
                 </div>

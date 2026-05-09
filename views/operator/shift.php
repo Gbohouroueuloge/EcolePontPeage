@@ -79,7 +79,7 @@ $incidents = $query->fetchColumn();
           Heure Actuel : <?= date('H\h:i') ?>
         </h2>
         <p class="text-on-tertiary-container text-sm font-medium tracking-wide">
-          DÉBUTÉ À <?= $agent->getDateDebut()->format('H\h:i') ?> • <?= $agent->is_en_cours() ? 'EN COURS' : 'FINI À ' . $agent->getDateFin()->format('H\h:i')  ?>
+          DÉBUTÉ À <?= $agent->getDateDebut() !== null ? $agent->getDateDebut()->format('H\h:i') : '' ?> • <?= $agent->is_en_cours() ? 'EN COURS' : 'FINI À ' . ($agent->getDateFin() !== null ? $agent->getDateFin()->format('H\h:i') : '')  ?>
         </p>
       </div>
     </div>
